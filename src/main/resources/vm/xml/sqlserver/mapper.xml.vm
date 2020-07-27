@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${packageName}.mapper.${ClassName}Mapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="${ClassName}">
+        #foreach($column in $columns)
+            <result column="${column.tableFiled}" property="${column.name}"></result>
+        #end
+    </resultMap>
+
+    <!-- 模型查询映射结果 -->
+    <resultMap id="ModelResultMap" type="${packageName}.model.${ClassName}Model" extends="BaseResultMap"></resultMap>
+
+    <!-- list model 查询 -->
+    <select id="selectModelList" parameterType="${packageName}.form.${ClassName}Form" resultMap="ModelResulMap">
+        SELECT
+        #foreach($column in $columns)
+            t.$column.tableFiled
+        #end FROM ${tableName}
+        <where>
+            #foreach($column in $columns)
+                #set($type = $column.queryType)
+                #if($column.query)
+
+                    #if($type == 'between')
+                        <if test="${column.name}Begin != null and ${column.name}Begin != '' and ${column.name}End != null and ${column.name}End != ''">
+                            and ${column.name} between #{${column.name}Begin} and #{${column.name}End}
+                        </if>
+                    #else
+                        <if test="$column.name != null #if($column.type == 'String') and $column.name != ''#end">
+                            and $column.name
+                            #if($type == 'like')
+                                LIKE '%' + #{$column.name} + '%'
+                            #elseif($type == 'eq')
+                                = #{$column.name}
+                            #elseif($type == 'ne')
+                                != #{$column.name}
+                            #elseif($type == 'gt')
+                                > #{$column.name}
+                            #elseif($type == 'gte')
+                                >= #{$column.name}
+                            #elseif($type == 'lt')
+                                <![CDATA[ <]]> #{$column.name}
+                            #elseif($type == 'lte')
+                                <![CDATA[ <=]]> #{$column.name}
+                            #end
+                        </if>
+                    #end
+                #end
+            #end
+        </where>
+    </select>
+</mapper>

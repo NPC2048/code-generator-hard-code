@@ -1,0 +1,19 @@
+--- 实体类 sql
+CREATE TABLE [dbo].[${tableName}] (
+[id] bigint NOT NULL,
+#foreach($column in $columns)
+[$column.tableField] $column.sqlType,
+#end
+PRIMARY KEY CLUSTERED ([id])
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = OFF)
+)
+GO
+
+#foreach($column in $columns)
+EXEC sp_addextendedproperty
+'MS_Description', N'${column.comment}',
+'SCHEMA', N'dbo',
+'TABLE', N'${tableName}',
+'COLUMN', N'id'
+GO
+#end

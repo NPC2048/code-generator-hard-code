@@ -1,0 +1,32 @@
+package ${packageName}.service.impl;
+
+import java.util.List;
+    #foreach ($column in $columns)
+        #if($column.javaField == 'createTime' || $column.javaField == 'updateTime')
+        import com.ruoyi.common.utils.DateUtils;
+            #break
+        #end
+    #end
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import ${packageName}.mapper.${ClassName}Mapper;
+import ${packageName}.entity.${ClassName};
+import ${packageName}.service.${ClassName}Service;
+import com.ruoyi.common.core.text.Convert;
+
+/**
+ * ${functionName}Service业务层处理
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Service
+public class ${ClassName}ServiceImpl extends BaseServiceImpl<${ClassName}Mapper, ${ClassName}> implements ${ClassName}Service {
+
+    public Page<${ClassName}Model> pageList(Pager pager, ${ClassName}Form form) {
+        Page<${ClassName}Model> page = this.initQueryPage(pager);
+        page.setRecords(this.baseMapper.selectModelList(page, form));
+        return page;
+    }
+
+}

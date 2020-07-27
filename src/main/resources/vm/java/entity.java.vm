@@ -1,0 +1,33 @@
+package ${packageName}.entity;
+
+import com.baomidou.mybatisplus.annotations.TableField;
+#foreach ($import in $importList)
+import ${import};
+#end
+/**
+ * ${functionName}对象 ${tableName}
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+public class $ClassName {
+
+    #foreach ($column in $columns)
+        /**
+         * $column.comment
+         */
+        @TableField("${tableFiled}")
+        private ${column.type} ${column.name};
+    #end
+
+    #foreach($column in $columns)
+        public $column.javaType get${column.upName}() {
+            return $column.name;
+            }
+
+        public void set${column.upName}(${column.javaType} $column.name) {
+            this.$column.name = $column.name;
+            }
+    #end
+
+}

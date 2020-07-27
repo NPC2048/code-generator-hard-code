@@ -1,0 +1,34 @@
+package ${packageName}.entity;
+
+#foreach ($import in $importList)
+import ${import};
+#end
+/**
+ * ${businessName}对象 ${tableName}
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+public class ${ClassName}Model {
+
+    #foreach ($column in $columns)
+        /**
+         * $column.comment
+         */
+        #foreach($valid in $column.valids)
+        @${valid.type}(message = "${valid.failMessage}")
+        #end
+    private ${column.type} ${column.name};
+    #end
+
+    #foreach($column in $columns)
+        public $column.javaType get${column.upName}() {
+            return $column.name;
+        }
+
+        public void set${column.upName}(${column.javaType} $column.name) {
+            this.$column.name = $column.name;
+        }
+    #end
+
+}

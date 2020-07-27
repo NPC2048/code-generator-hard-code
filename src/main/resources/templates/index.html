@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Code Generate</title>
+    <link href="css/bootstrap/4.5.0/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.17.1/bootstrap-table.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h2>代码生成配置</h2>
+    <!-- 工具栏 -->
+    <div class="btn-group">
+
+    </div>
+    <form onsubmit="return false">
+        <div class="row">
+            <div class="col-4">
+                <button class="btn btn-info" data-toggle="collapse" data-target="#global">全局变量</button>
+                <div id="global" class="collapse show">
+                    <div class="form-group">
+                        <label for="author">作者(author)</label>
+                        <input id="author" class="form-control" placeholder="请输入作者" value="${username}">
+                    </div>
+                    <div class="form-group">
+                        <label for="commName">所有模块通用的名称(commName)</label>
+                        <input id="commName" name="commName" class="form-control" placeholder="role">
+                    </div>
+                    <div class="form-group">
+                        <label for="businessName">业务名称(businessName)</label>
+                        <input id="businessName" class="form-control" placeholder="业务名称, 例: 角色管理">
+                    </div>
+                    <div class="form-group">
+                        <label for="frontPath">前端代码生成路径
+                            <span class="badge badge-pill badge-info" data-toggle="popover" data-placement="top"
+                                  data-content="例: D:/github/code-generator/src/main/resources">?</span>：
+                        </label>
+                        <input id="frontPath" class="form-control"
+                               placeholder="例: D:/github/code-generator/src/main/resources">
+                    </div>
+                    <div class="form-group">
+                        <label for="codeGeneratePath">后端代码生成路径：</label>
+                        <input id="codeGeneratePath" class="form-control"
+                               placeholder="例: D:/github/code-generaotr/src/main/java/">
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <button class="btn btn-info" data-toggle="collapse" data-target="#backend">后端变量</button>
+                <div id="backend" class="collapse show">
+                    <div class="form-group">
+                        <label for="packageName">包名(packageName)</label>
+                        <input id="packageName" name="packageName" class="form-control" placeholder="com.bcm.h2h"
+                               value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="tableName">表名</label>
+                        <input id="tableName" class="form-control" placeholder="表名">
+                    </div>
+                    <div class="form-group">
+                        <label for="ClassName">类名：</label>
+                        <input id="ClassName" class="form-control"
+                               placeholder="用作 controller、service、impl、mapper、mapper.xml、的前缀名, entity 的类名">
+                    </div>
+                    <div class="form-group">
+                        <label for="functionName">功能名：</label>
+                        <input id="functionName" class="form-control" placeholder="功能名">
+                    </div>
+                    <div class="form-group">
+                        <label for="viewPath">视图路径
+                            <span class="badge badge-pill badge-info" data-toggle="popover" data-placement="top"
+                                  data-content="用于 Controller 类上的的 @RequestMapping">?</span>
+                        </label>
+                        <input id="viewPath" class="form-control" placeholder="该功能的根路径, 如角色管理功能, 为 role">
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <button class="btn btn-info" data-toggle="collapse" data-target="#form">packages</button>
+                <div id="form" class="collapse show">
+                    <div class="form-group">
+                    </div>
+                </div>
+            </div><!-- end col-4 div -->
+        </div><!-- end row div -->
+        <div class="row">
+            <table id="columnTables" class="table"></table>
+        </div>
+    </form>
+</div>
+<script src="js/jquery/3.5.1/jquery.min.js" type="text/javascript"></script>
+<script src="js/popper/1.15.0/popper.min.js"></script>
+<script src="js/bootstrap/4.5.0/bootstrap.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.17.1/bootstrap-table.min.js"></script>
+<script src="js/index.js?v=1"></script>
+<script type="text/javascript">
+  $(function () {
+    var javaTypeList = [];
+    <#list javaTypes as type>
+        javaTypeList.push({
+          code: '${type}',
+          name: '${type.javaType}'
+        });
+    </#list>
+
+    index.init({
+      javaTypes: javaTypeList
+    })
+  })
+
+</script>
+</body>
+</html>

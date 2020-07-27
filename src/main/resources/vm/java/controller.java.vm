@@ -1,0 +1,174 @@
+package ${packageName}.controller;
+
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.*;
+import ${packageName}.domain.${ClassName};
+import ${packageName}.service.I${ClassName}Service;
+import ${baseController}
+import javax.validation.Valid;
+
+import com.bcm.h2h.core.exception.BizExceiption;
+import com.bcm.h2h.core.annotation.AjaxLoadPage;
+import com.bcm.h2h.core.annotation.Log;
+import com.bcm.h2h.core.bean.DataGrid;
+import com.bcm.h2h.core.bean.Json;
+import com.bcm.h2h.core.bean.Pager;
+#if($table.crud)
+    #foreach($package in $crudPackages)
+    import $package;
+    #end
+#end
+
+/**
+ * ${businessName}Controller
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Controller
+@RequestMapping("/${viewPath}" )
+public class ${ClassName}Controller extends BaseController {
+
+    @Autowired
+    private I${ClassName}Service ${className}Service;
+
+    @RequiresPermissions("${permissionPrefix}:index" )
+    @GetMapping("/index" )
+    public String index(ModelMap modelMap) {
+        // 添加枚举类到 modelMap
+        #foreach( $elem in $enums)
+            modelMap.put("${elem.name}" , ${elem}.values())
+        #end
+        return "${viewPath}/index" ;
+    }
+
+    /**
+     * 查询${functionName}列表
+     */
+    @RequiresPermissions("${commName}:list" )
+    @PostMapping("/list" )
+    @ResponseBody
+    public DataGrid list(Pager pager, ${listFormType} form) {
+        return toJsonDataGrid(this.${className}Service.pageList(pager, form));
+    }
+
+    /**
+     * 查看${functionName}详情
+     * @param id id
+     * @param modelMap modelmap
+     * @return detail
+     */
+    @AjaxLoadPage
+    @RequestMapping(value = "/detail/{id}" , method = RequestMethod.GET)
+    public String detail(@PathVariable Long id, ModelMap modelMap) {
+        ${ClassName}Model model = ${className}Service.getModelById(id);
+        modelMap.put("model" , model);
+        return "${viewPath}/detail" ;
+    }
+
+    #if($table.crud)
+        /**
+         * 新增${functionName}
+         */
+        @AjaxLoadPage
+        @GetMapping("/add" )
+        public String add() {
+            return "${viewPath}/add" ;
+        }
+    #end
+
+    /**
+     * 新增保存${functionName}
+     */
+    @Log("新增保存${functionName}" )
+    @RequiresPermissions("${permissionPrefix}:add" )
+    @PostMapping("/add" )
+    @ResponseBody
+    public Json add(@Valid ${ClassName}SaveModel model) {
+        this.${className}Service.save(model);
+        return Json.success("新增成功" , model);
+    }
+
+    /**
+     * 修改${functionName}
+     */
+    @AjaxLoadPage
+    @GetMapping("/edit/{id}" )
+    public String edit(@PathVariable Long id, int rowIndex, ModelMap modelMap) {
+        ${ClassName}Model model = this.${classname}Service.getById(id);
+        modelMap.put("model" , model);
+        // 返回对应的行索引
+        modelMap.put("rowIndex" , rowIndex);
+        return "${viewPath}/edit" ;
+    }
+
+    /**
+     * 修改保存${functionName}
+     */
+    @Log(title = "修改保存${functionName}" )
+    @RequiresPermissions("${permissionPrefix}:edit" )
+    @PostMapping("/edit/{id}" )
+    @ResponseBody
+    public Json editSave(@PathVariable Long id, @Valid ${ClassName}EditModel model) {
+        ${ClassName} entity = new ${ClassName}();
+        BeanUtils.copyProperties(model, entity);
+        this.${className}Service.updateById(model);
+        return Json.success("修改成功" , model);
+    }
+
+    /**
+     * 切換${functionName}狀態
+     * @param id 實體類 id
+     * @return Json
+     */
+    @Log("切換${functionName}狀態" )
+    @RequiresPermissions("${permissionPrefix}:changeStatus" )
+    @RequestMapping(value = "/changeStatus/{id}" )
+    @ResponseBody
+    public Json changeStatus(@PathVariable Long id) {
+            ${ClassName}Model model = this.${className}.getModelById(id);
+        if (model == null) {
+            throw new BizException("沒有找到對應的記錄: ${cuntionName} " + id)
+        }
+        return Json.success("狀態切換成功" , model);
+    }
+
+    #if($table.crud)
+        /**
+         * 删除${functionName}
+         */
+        @Log("刪除${functionName}" )
+        @RequiresPermissions("${permissionPrefix}:delete" )
+        @PostMapping("/delete/{id}" )
+        @ResponseBody
+        public Json delete(@PathVariable Long id) {
+                ${className}Service.deleteById(id);
+            return Json.success("刪除成功" );
+        }
+
+        /**
+         * 删除
+         */
+        @Log("批量刪除${functionName}" )
+        @RequiresPermissions("${permissionPrefix}:deleteByIds" )
+        @PostMapping("/deleteByIds" )
+        @ResponseBody
+        public Json deleteByIds(String ids) {
+            if (StringUtils.isBlank(ids)) {
+                throw new BizException("id 不能為空" );
+            }
+            String idArr = ids.split(ids, "," );
+            for (String id : idArr) {
+                    ${className}Service.deleteById(id);
+            }
+            return Json.success("刪除成功" );
+        }
+    #end
+}

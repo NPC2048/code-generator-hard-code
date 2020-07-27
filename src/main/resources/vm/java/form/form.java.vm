@@ -1,0 +1,48 @@
+package ${packageName}.form;
+
+import ${packageForm}.BaseForm;
+#foreach ($import in $importList)
+import ${import};
+#end
+#if($valids && !$valids.isEmpty())
+import javax.validation.constraints.*;
+#end
+
+/**
+ * ${businessName}表单
+ *
+ * @author ${author}
+ * @since ${datetime}
+ */
+public class ${ClassName}Form extends BaseForm {
+
+    #foreach($column in $columns)
+        /**
+         * $column.comment
+         */
+        #foreach($valid in $column.valids)
+        @${valid.type}(message = "${valid.failMessage}")
+        #end
+    private ${column.javaType} ${column.name};
+    #end
+
+    #foreach($column in $columns)
+        public $column.javaType get${column.upName}() {
+            return $column.name;
+        }
+
+        public void set${column.upName}(${column.javaType} $column.name) {
+            this.$column.name = $column.name;
+        }
+    #end
+
+    @Override
+    public String toString() {
+        StringBuilder string = new StringBuilder("${ClassName}Form [");
+        #foreach($column in $columns)
+            string.append("${column.name}:").append(this.${column.name}).append(',');
+        #end
+        string.setCharAt(string.length() - 1, ']');
+        return string.toString();
+    }
+}

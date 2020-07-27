@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@include file="/WEB-INF/pages/commons/taglibs.jsp" %>
+<html lang="zh_CN">
+
+<head>
+  <title>${showName}</title>
+  <%@include file="/WEB-INF/pages/commons/inc.jsp" %>
+</head>
+<body class="bgF6">
+<!-- top navigation 头部导航栏 -->
+<%@include file="/WEB-INF/pages/layout/top_nav.jsp" %>
+<div class="wrapperM">
+  <div class="tableTable mainContainer">
+    <!-- left main menu 左侧主菜单 -->
+    <%@include file="/WEB-INF/pages/layout/left_main_menu.jsp" %>
+    <!-- page content -->
+    <div class="right_col main" role="main">
+      <!-- Search Form -->
+      <div class="x_panel">
+        <!-- Search Toolbox -->
+        <div class="x_title">
+          <h2>${functionName}</h2>
+          <ul class="nav navbar-right panel_toolbox">
+            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+          </ul>
+          <div class="clearfix"></div>
+        </div>
+        <!-- /Search Toolbox -->
+        <div class="x_content">
+          <div class="row">
+            <!-- Search Form Main -->
+            <form id="searchForm" class="form-horizontal" action="#" method="post" autocomplete="off">
+              #foreach($column in $columns)
+              <div class="col-md-4 col-sm-12 col-xs-12 form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12">${column.showName}</label>
+                <div class="col-md-9 col-sm-9 col-xs-12 ">
+                  #if($column.formType == 'scope')
+                    #if($column.type == 'Date')
+                      <div class="input-group input-daterange" data-provide="datepicker">
+                    #else
+                      <div class="input-group">
+                    #end
+                    <input type="text" class="form-control" name="${column.name}Begin" value="" placeholder="開始">
+                    <div class="input-group-addon">-</div>
+                    <input type="text" class="form-control" name="${column.name}End" value="" placeholder="結束">
+                  </div>
+                  #elseif($column.formType == 'select')
+                    <select class="form-control selectpicker show-menu-arrow show-tick" name="operationType" title="請選擇" data-live-search="true">
+                      <option value="" selected>請選擇</option>
+                      <c:forEach items="\${${column.name}Enums}" var="type">
+                        <option value="\${type}">\${transType.name}</option>
+                      </c:forEach>
+                    </select>
+                  #elseif($column.formType == 'datetime')
+                    <div class="input-group input-daterange" data-provide="datepicker">
+                      <input type="text" class="form-control" name="${column.name}" value="" placeholder="請選擇日期">
+                    </div>
+                  #else
+                    <input type="text" class="form-control" name="${column.name}" value="" placeholder="請輸入${column.showName}">
+                  #end
+                  </div>
+                </div>
+              </div>
+              #end
+              <div class="form-group">
+                <div class="col-md-7 col-sm-7 col-xs-9 col-md-offset-5 col-sm-offset-5 col-xs-offset-3 ">
+                  <button id="searchResetBtn" class="btn btn-default resetBtn" type="button">重置
+                  </button>
+                  <button id="searchBtn" type="button" class="btn btn-success">查詢</button>
+                  #if($hasExcel)
+                    <!--<shiro:hasPermission name="apiLog:exportExcel">
+                          <button id="searchExportBtn" type="button" class="btn btn-primary">导出</button>
+                        </shiro:hasPermission>-->
+                  #end
+                </div>
+              </div>
+            </form>
+            <!-- /Search Form Main -->
+          </div>
+        </div>
+      </div>
+      <!-- /Search Form -->
+      <div id="toolbar">
+      </div>
+      <div class="fr titleBtn">
+        <div class="tableCell">
+          <shiro:hasPermission name="${permissionPrefix}:add">
+            <button type="button" id="addBtn" class="btn btn-success infoBtn" data-toggle="modal" data-target="#myModal">新增</button>
+          </shiro:hasPermission>
+          <shiro:hasPermission name="${permissionPrefix}:deleteByIds">
+            <button id="removeBtn" class="btn btn-success infoBtn" href="javascript:void(0);">刪除
+            </button>
+          </shiro:hasPermission>
+        </div>
+      </div>
+      <!-- Data Table -->
+      <table id="table"></table>
+      <!-- /Data Table -->
+    </div>
+    <!-- /page content -->
+  </div>
+</div>
+<!-- footer content -->
+<%@include file="/WEB-INF/pages/layout/footer.jsp" %>
+<!-- detail dialog -->
+#if($hasAdd)
+<div id="addDialog" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-hidden="true"></div>
+#end
+#if($hasEdit)
+<div id="editDialog" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-hidden="true"></div>
+#end
+#if($hasDetail)
+<div id="detailDialog" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-hidden="true"></div>
+#end
+#if($hasDelete)
+<div id="deleteDialog" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-hidden="true"></div>
+#end
+
+<!-- /changePassword dialog -->
+<%@include file="/WEB-INF/pages/commons/incjs.jsp" %>
+<!-- Custom index Scripts -->
+<script src="${ctx}/static/js/pages/${viewPath}/index.js?v=1"></script>
+<script type="text/javascript">
+#if($hasAdd)
+  var isHasAdd = false;
+  <shiro:hasPermission name="${permissionPrefix}:add" >
+    isHasAdd = true;
+  </shiro:hasPermission>
+#end
+
+#if($hasDetail)
+  var isHasDetail = false;
+  <shiro:hasPermission name="${permissionPrefix}:detail" >
+    isHasDetail = true;
+  </shiro:hasPermission>
+#end
+
+#if($hasEdit)
+  var isHasEdit = false;
+  <shiro:hasPermission name="${permissionPrefix}:edit" >
+    isHasAdd = true;
+  </shiro:hasPermission>
+#end
+#if($hasChangeStatus)
+  var isChangeStatus = false;
+  <shiro:hasPermission name="${permissionPrefix}:changeStatus" >
+    isChangeStatus = true;
+  </shiro:hasPermission>
+#end
+#if($hasDelete)
+  var isHasDelete = false;
+  <shiro:hasPermission name="${permissionPrefix}:delete" >
+    isHasDelete = true;
+  </shiro:hasPermission>
+#end
+
+#foreach($enum in $enumList)
+  var ${enum}EnumList = [];
+  <c:forEach items="\${$enum}Enums" var="object">
+      ${enum}EnumList.push({
+        code: "\${object.code}",
+        name: "\${object.name}"
+      });
+  </c:forEach>
+#end
+
+  $(function () {
+    ${functionName}_index_pager.init({
+      transTypeEnumList: transTypeEnumList,
+      statusEnumList: statusEnumList,
+        #foreach($enum in $enumList)
+                ${enum}EnumList: ${enum}EnumList
+        #end
+        #if($hasDetail)
+          isHasDetail: isHasDetail,
+        #end
+        #if($hasAdd)
+          isHasAdd: isHasAdd,
+        #end
+        #if($hasEdit)
+          isHasEdit: isHasEdit,
+        #end
+        #if($hasDelete)
+          isHasDelete: isHasDelete
+        #end
+        #if($hasChangeStatus)
+          isChangeStatus: isChangeStatus
+        #end
+    });
+  });
+</script>
+</body>
+</html>

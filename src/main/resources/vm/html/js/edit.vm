@@ -1,0 +1,110 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@include file="/WEB-INF/pages/commons/taglibs.jsp" %>
+<div class="modal-header">
+    <button type="button" class="close closeBtn" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title">${showName}</h4>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <form id="editForm" class="form-horizontal" action="#" method="post">
+            <input type="hidden" id="id" name="id" value="\${model.id}">
+            <%--            <div class="col-md-12 col-sm-12 col-xs-12 item form-group">--%>
+            <%--                <label class="control-label col-md-3 col-sm-3 col-xs-12">主機名稱</label>--%>
+            <%--                <div class="col-md-9 col-sm-9 col-xs-12">--%>
+            <%--                    <input type="text" class="form-control" name="hostName" value="${serverConfig.hostName}"--%>
+            <%--                           placeholder="">--%>
+            <%--                </div>--%>
+            <%--            </div>--%>
+            <div class="col-md-12 col-sm-12 col-xs-12 item form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12">主機名稱</label>
+                <div class="col-md-9 col-sm-9 col-xs-12">
+                    <select class="form-control selectpicker show-menu-arrow show-tick"
+                            title="請選擇" name="type" data-live-search="true" data-size="12" data-container="body">
+                        <c:forEach items="${serverConfigTypeEnum}" var="object">
+                            <option value="${object.code}" <c:if test='${serverConfig.type==object.code}'>selected="selected"</c:if>>${object.name}</option>
+                        </c:forEach>
+                    </select>
+                </div>
+            </div>
+            #foreach($column in $columns)
+              <div class="col-md-12 col-sm-12 col-xs-12 item form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12">IP地址</label>
+                <div class="col-md-9 col-sm-9 col-xs-12">
+                  <input type="text" class="form-control" name="ip" value="${serverConfig.ip}"
+                         placeholder="">
+                </div>
+              </div>
+            #end
+            <div class="col-md-12 col-sm-12 col-xs-12 item form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12">IP地址</label>
+                <div class="col-md-9 col-sm-9 col-xs-12">
+                    <input type="text" class="form-control" name="ip" value="${serverConfig.ip}"
+                           placeholder="">
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xs-12 item form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12">端口</label>
+                <div class="col-md-9 col-sm-9 col-xs-12">
+                    <input type="text" class="form-control" name="port" value="${serverConfig.port}"
+                           placeholder="">
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xs-12 item form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12">登錄名</label>
+                <div class="col-md-9 col-sm-9 col-xs-12">
+                    <input type="text" class="form-control" name="userName" value="${serverConfig.userName}"
+                           placeholder="">
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xs-12 item form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12">密碼</label>
+                <div class="col-md-9 col-sm-9 col-xs-12">
+                    <input type="password" class="form-control" name="password" value="${serverConfig.password}"
+                           placeholder="">
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xs-12 item form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12">路徑</label>
+                <div class="col-md-9 col-sm-9 col-xs-12">
+                    <input type="text" class="form-control" name="path" value="${serverConfig.path}"
+                           placeholder="">
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xs-12 form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12">描述</label>
+                <div class="col-md-9 col-sm-9 col-xs-12">
+                    <textarea class="form-control" rows="3" name="details"
+                              placeholder="">${serverConfig.details}</textarea>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xs-12 form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12">狀態</label>
+                <div class="col-md-9 col-sm-9 col-xs-12">
+                    <select class="form-control selectpicker show-menu-arrow show-tick"
+                            title="請選擇" name="status" data-live-search="true" data-size="12"
+                            data-container="body">
+                        <c:forEach items="${serverStatusList}" var="obj">
+                            <option value="${obj.code}"
+                                    <c:if test='${serverConfig.status==obj.code}'>selected="selected"</c:if>>${obj.name}</option>
+                        </c:forEach>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" data-dismiss="modal" class="btn btn-default closeBtn">關閉</button>
+    <button type="button" class="btn btn-default resetBtn">重置</button>
+    <button type="button" class="btn btn-success saveBtn">保存</button>
+
+</div>
+<!-- Custom Scripts -->
+<script src="${ctx}/static/js/pages/serverConfig/edit.js?v=5"></script>
+<script type="text/javascript">
+    $(function () {
+        server_config_edit_pager.init({
+            rowIndex: '${rowIndex}'//所要编辑行对应的索引
+        });
+    });
+</script>

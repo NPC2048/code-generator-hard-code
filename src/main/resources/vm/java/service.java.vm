@@ -1,0 +1,27 @@
+package ${packageName}.service;
+
+import java.util.List;
+
+import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.service.IService;
+import com.bcm.h2h.core.bean.Pager;
+import ${packageName}.entity.${ClassName};
+import ${packageName}.form.${ClassName}Form;
+
+/**
+ * ${functionName}Service接口
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+public interface ${ClassName}Service extends IService<${ClassName}> {
+
+    /**
+     * 分页查询 ${functionName}
+     * @param pager 分页参数
+     * @param form 条件表单
+     * @return Page<${ClassName}Model>
+     */
+    Page<${ClassName}Model> pageList(Pager pager, ${ClassName}Form form);
+
+}

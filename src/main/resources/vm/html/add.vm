@@ -1,0 +1,46 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/pages/commons/taglibs.jsp"%>
+<div class="modal-header">
+  <button type="button" class="close closeBtn" data-dismiss="modal" aria-hidden="true">&times;</button>
+  <h4 class="modal-title">新增${showName}</h4>
+</div>
+<div class="modal-body">
+  <div class="row">
+    <form id="addForm" class="form-horizontal" action="#" method="post">
+    #foreach($column in $columns)
+      <div class="col-md-12 col-sm-12 col-xs-12 item form-group">
+        <label class="control-label col-md-3 col-sm-3 col-xs-12">${column.showName}</label>
+        <div class="col-md-9 col-sm-9 col-xs-12">
+          #if($column.formType == 'select')
+          <select class="form-control selectpicker show-menu-arrow show-tick" title="請選擇" name="type" data-live-search="true" data-size="12" data-container="body">
+            <c:forEach items="${${column.name}Enums}" var="object">
+              <option value="${object.code}">${object.name}</option>
+            </c:forEach>
+          </select>
+          #elseif($column.formType == 'datatime')
+          <div class="input-group input-daterange" data-provide="datepicker">
+            <input type="text" class="form-control" name="${column.name}" value="" placeholder="請選擇日期">
+          </div>
+          #elseif($column.formType == 'text')
+          <textarea class="form-control" rows="3" name="${column.name}" placeholder="請輸入${column.showName}"></textarea>
+          #else
+          <input type="text" class="form-control" name="${column.name}" placeholder="請輸入${column.showName}" />
+          #end
+        </div>
+      </div>
+    #end
+    </form>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" data-dismiss="modal" class="btn btn-default closeBtn">關閉</button>
+  <button type="button" class="btn btn-default resetBtn">重置</button>
+  <button type="button" class="btn btn-primary saveBtn">新增</button>
+</div>
+<!-- Custom Scripts -->
+<script src="${ctx}/static/js/pages/${functionName}/add.js"></script>
+<script type="text/javascript">
+  \$(function() {
+    ${functionName}_add_pager.init();
+  });
+</script>
