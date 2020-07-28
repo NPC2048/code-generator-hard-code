@@ -2,13 +2,10 @@ package com.bcm.h2h.bcmh2hcodegenerator.common.utils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.velocity.VelocityContext;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author yuelong.liang
@@ -20,20 +17,30 @@ public class MyVelocityUtils {
      *
      * @return 模板列表
      */
-    public static List<String> getTemplateList() {
-        List<String> templates = new ArrayList<>();
-        templates.add("vm/java/entity.java.vm");
-        templates.add("vm/java/mapper.java.vm");
-        templates.add("vm/java/service.java.vm");
-        templates.add("vm/java/serviceImpl.java.vm");
-        templates.add("vm/java/controller.java.vm");
-        templates.add("vm/java/model/model.java.vm");
-        templates.add("vm/java/form/form.java.vm");
-        templates.add("vm/java/controller.java.vm");
-        templates.add("vm/xml/sqlserver/mapper.xml.vm");
-        templates.add("vm/html/index.vm");
-        templates.add("vm/html/add.vm");
-        templates.add("vm/sql/sql.vm");
+    public static List<Map.Entry<String, String>> getTemplateList(JSONObject config) {
+        List<Map.Entry<String, String>> templates = new ArrayList<>();
+        JSONObject vm = config.getJSONObject("vm");
+        Set<Map.Entry<String, Object>> set = vm.entrySet();
+        for (Map.Entry<String, Object> entry : set) {
+            System.out.println(entry.getKey() + ":" + entry.getValue());
+            Map.Entry<String, String> newEntry = new Map.Entry<String, String>() {
+                @Override
+                public String getKey() {
+                    return entry.getKey();
+                }
+
+                @Override
+                public String getValue() {
+                    return String.valueOf(entry.getValue());
+                }
+
+                @Override
+                public String setValue(String value) {
+                    return String.valueOf(entry.setValue(value));
+                }
+            };
+            templates.add(newEntry);
+        }
         return templates;
     }
 
@@ -51,6 +58,11 @@ public class MyVelocityUtils {
         JSONArray importList = object.getJSONArray("importList");
 
         VelocityContext velocityContext = new VelocityContext();
+        Set<Map.Entry<String, Object>> entrySet = object.entrySet();
+        // 添加变量到 context
+        for (Map.Entry<String, Object> entry : entrySet) {
+            velocityContext.put(entry.getKey(), entry.getValue());
+        }
         velocityContext.put("root" , object);
         velocityContext.put("tableName" , object.getString("tableName"));
         velocityContext.put("functionName" , StringUtils.isNotEmpty(functionName) ? functionName : "【请填写功能名称】");
@@ -79,6 +91,61 @@ public class MyVelocityUtils {
     public static String getPackagePrefix(String packageName) {
         int lastIndex = packageName.lastIndexOf(".");
         return StringUtils.substring(packageName, 0, lastIndex);
+    }
+
+    public static String getFileName(String template, JSONObject config) {
+        // 项目路径
+        String projectPath = config.getString("projectPath");
+        // mybatis 路径
+        String templatesPath = config.getString("templatesPath");
+        // 包路径
+        String packageName = config.getString("packageName");
+        // 模块名
+        String moduleName = config.getString("moduleName");
+        // 大写类名
+        String className = config.getString("className");
+        // 业务名称
+        String businessName = config.getString("businessName");
+
+        String javaPath = projectPath + "/" + StringUtils.replace(packageName, "." , "/");
+        String mybatisPath = config.getString("mybatisPath") + "/" + moduleName;
+        String htmlPath = templatesPath + "/" + moduleName + "/" + businessName;
+        String jsPath = config.getString("jsPath");
+        String jspPath = config.getString("jspPath");
+        // 文件名称
+        String fileName = "" ;
+        if (template.contains("entity.java.vm")) {
+            fileName = StringUtils.format("{}/entity/{}.java" , javaPath, className);
+        }
+        if (template.contains("mapper.java.vm")) {
+            fileName = StringUtils.format("{}/mapper/{}Mapper.java" , javaPath, className);
+        } else if (template.contains("service.java.vm")) {
+            fileName = StringUtils.format("{}/service/I{}Service.java" , javaPath, className);
+        } else if (template.contains("serviceImpl.java.vm")) {
+            fileName = StringUtils.format("{}/service/impl/{}ServiceImpl.java" , javaPath, className);
+        } else if (template.contains("controller.java.vm")) {
+            fileName = StringUtils.format("{}/controller/{}Controller.java" , javaPath, className);
+        } else if (template.contains("mapper.xml.vm")) {
+            fileName = StringUtils.format("{}/{}Mapper.xml" , mybatisPath, className);
+        } else if (template.contains("form.java.vm")) {
+            fileName = StringUtils.format("{}/form/{}Form.java" , javaPath, className);
+        } else if (template.contains("model.java.vm")) {
+            fileName = StringUtils.format("{}/model/{}Model.java" , javaPath, className);
+        } else if (template.contains("index.vm")) {
+            return StringUtils.format("{}/index.jsp" , jspPath, businessName);
+        } else if (template.contains("index.js.vm")) {
+            return StringUtils.format("{}/index.js" , jsPath, businessName);
+        }
+        if (template.contains("list.html.vm")) {
+            fileName = StringUtils.format("{}/{}.html" , jspPath, businessName);
+        } else if (template.contains("add.html.vm")) {
+            fileName = StringUtils.format("{}/add.html" , jspPath);
+        } else if (template.contains("edit.html.vm")) {
+            fileName = StringUtils.format("{}/edit.html" , jspPath);
+        } else if (template.contains("sql.vm")) {
+            fileName = businessName + "Menu.sql" ;
+        }
+        return fileName;
     }
 
 }

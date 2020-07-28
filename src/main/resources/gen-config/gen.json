@@ -1,0 +1,23 @@
+{
+  "columns": [
+    {
+      "name": "id",
+      "upName": "Id",
+      "javaType": "Long",
+      "sqlType": "bigint",
+      "tableField": "id",
+      "formType": "text",
+      "queryType": "eq"
+    },
+    {
+      "name": "state",
+      "upName": "State",
+      "showName": "状态",
+      "type": "Integer",
+      "comment": "状态",
+      "sqlType": "tinyint",
+      "tableField": "state",
+      "formType": "select"
+    }
+  ]
+}

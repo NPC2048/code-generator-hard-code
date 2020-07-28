@@ -1,25 +1,64 @@
 {
   "author": "npc2048",
   "tableComment": "tableComment",
-  "basePackageName": "com.bcm.h2h",
+  "projectPath": "bcm-h2h",
+  "javaPath": "src/java",
+  "jspPath": "webapp/WEB-INF/pages",
+  "jsPath": "webapp/WEB-INF/static",
   "packageName": "web",
-  "moduleName": "role",
-  "commName": "role",
-  "tableName": "role",
-  "businessName": "role",
-  "functionName": "bcmApi",
-  "ClassName": "BcmApi",
+  "moduleName": "ApiTest",
+  "commName": "apiTest",
+  "tableName": "api_test",
+  "businessName": "apiTest",
+  "functionName": "api测试",
+  "ClassName": "ApiTest",
+  "className": "ApiTest",
   "Prefix": "bcm-h2h",
-  "columns": [
-    {
-      "name": "state",
-      "upName": "State",
-      "showName": "状态",
-      "type": "Integer",
-      "comment": "状态",
-      "sqlType": "tinyint",
-      "tableField": "state",
-      "formType": "select"
+  "genPath": "D:/temp",
+  "vm": {
+    "vm/java/entity.java.vm": {
+      "moduleName": "bcm-h2h-entity",
+      "fileName": "{}/entity/{}.java"
+    },
+    "vm/java/mapper.java.vm": {
+      "moduleName": "bcm-h2h-dao",
+      "fileName": "{}/mapper/{}Mapper.java"
+    },
+    "vm/xml/sqlserver/mapper.xml.vm": {
+      "moduleName": "bcm-h2h-dao",
+      "fileName": "{}/{}Mapper.xml"
+    },
+    "vm/java/service.java.vm": {
+      "moduleName": "bcm-h2h-service",
+      "fileName": "{}/service/{}Service.java"
+    },
+    "vm/java/serviceImpl.java.vm": {
+      "moduleName": "bcm-h2h-service",
+      "fileName": "{}/service/impl/{}ServiceImpl.java"
+    },
+    "vm/java/controller.java.vm": {
+      "moduleName": "bcm-h2h-web",
+      "fileName": "{}/controller/{}Controller.java"
+    },
+    "vm/java/model/model.java.vm": {
+      "moduleName": "bcm-h2h-modal",
+      "fileName": "{}/model/{}Model.java"
+    },
+    "vm/java/form/form.java.vm": {
+      "moduleName": "bcm-h2h-modal",
+      "fileName": "{}/form/{}Form.java"
+    },
+    "vm/html/index.vm": {
+      "moduleName": "bcm-h2h-web",
+      "fileName": "{}/index.jsp"
+    },
+    "vm/html/add.vm": {
+      "moduleName": "bcm-h2h-web",
+      "fileName": "{}/add.jsp"
+    },
+    "vm/sql/sql.vm": {
+      "moduleName": "../bcm-h2h-doc",
+      "fileName": "{}.table.sql"
     }
-  ]
+  }
 }

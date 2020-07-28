@@ -1,17 +1,17 @@
 # 全局配置
-global:
-  # 项目路径
-  project-path: F:/Temp
-  # 包名
-  package-name: com.bcm.h2h
-  # 业务名
-  business-name: 角色管理
-  # 通用名
-  comm-name: role
-  function-name: role
-  # 类名, 用于 form、model、service、dao等类的前缀, 用作 entity 类的类名
-  class-name: Role
-  # 首字母小写的类名
-  low-class-name: role
+# 项目路径
+project-path: F:/Temp
+# 包名
+package-name: com.bcm.h2h
+# 业务名
+business-name: 角色管理
+# 通用名
+comm-name: role
+# 模块名
+module-name: role
+function-name: role
+# 类名, 用于 form、model、service、dao等类的前缀, 用作 entity 类的类名
+class-name: Role
+
 
 

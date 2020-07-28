@@ -1,11 +1,18 @@
 # 列字段定义, 用于 前端 list查询、form表单、form类、model、实体类、mapper、sql 生成等
 columns:
-  # 字段名, 用于 java 字段定义等
-  name: state
-  # 首字母大写的字段名, 用于生成 getter/setter 方法
-  up-name: State
-  # 显示的名称
-  show-name: 状态
-  # java 类型,
-  java-type: Integer
-  #
+  - {
+    # 字段名, 用于 java 字段定义等
+    name: state,
+    # 首字母大写的字段名, 用于生成 getter/setter 方法
+    up-name: State,
+    # 显示的名称
+    show-name: 状态,
+    # java 类型,
+    java-type: Integer,
+  }
+  - {
+    name: name,
+    up-name: Name,
+    show-name: 角色名,
+    java-type: String,
+  }
