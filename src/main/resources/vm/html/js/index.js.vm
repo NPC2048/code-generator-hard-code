@@ -1,40 +1,42 @@
-var ${functionName}_index_pager = {
+var ${businessName}_index_pager = {
   //参数options
   options: {},
-  \$table: \$('#table'), //boostrap table
-  \$searchForm: \$('#searchForm'), // search from
-  #if($hasAdd)
-    \$addDialog: \$('#addDialog'),
-  #end
-  #if($hasEdit)
-    \$editDialog: \$('#editDialog'),
-  #end
-  #if($hasDetail)
-    \$detailDialog: \$('#detailDialog'),
-  #end
-  #if($hasDelete)
-    \$hasDelete: \$('#deleteDialog'),
-  #end
+  //boostrap table
+  $table: $('#table'),
+  // search from
+  $searchForm: $('#searchForm'),
+#if($hasAdd)
+  $addDialog: $('#addDialog'),
+#end
+#if($hasEdit)
+  $editDialog: $('#editDialog'),
+#end
+#if($hasDetail)
+  $detailDialog: $('#detailDialog'),
+#end
+#if($hasDelete)
+  $deleteDelete: $('#deleteDialog'),
+#end
   toolbar: {
-    \$searchBtn: \$('#searchBtn'), //search button
-    \$searchResetBtn: \$('#searchResetBtn'),
-    #if($hasAdd)
-      \$addBtn: \$('#addBtn'),
-    #end
-    #if($hasEdit)
-      \$removeBtn: \$('#removeBtn')
-    #end
-    #if($hasDelete)
+  $searchBtn: $('#searchBtn'), //search button
+  $searchResetBtn: $('#searchResetBtn'),
+#if($hasAdd)
+  $addBtn: $('#addBtn'),
+#end
+#if($hasEdit)
+  $removeBtn: $('#removeBtn')
+#end
+#if($hasDelete)
 
-    #end
-    #if($hasExcel)
-    //\$searchExportBtn: \$('#searchExportBtn'),
-    #end
+#end
+#if($hasExcel)
+  //\$searchExportBtn: \$('#searchExportBtn'),
+#end
   },
   isFisrtLoad: true, //标识是否首次打开页面,如果是,则不加载数据
   init: function (options) {
     //初始化参数
-    this.options = \$.extend(this.options, options || {});
+    this.options = $.extend(this.options, options || {});
     // 初始化boostrap table
     this.initTable();
     // 初始化搜索表单
@@ -44,27 +46,27 @@ var ${functionName}_index_pager = {
     // 初始化查询重置按钮点击事件
     this.initSearchResetBtnClick();
     // 初始化查询导出按钮点击事件
-    #if($hasExcel)
+#if($hasExcel)
     //this.initSearchExportBtnClick();
-    #end
-    #if($hasAdd)
-      //初始化新增记录按钮点击事件
-      this.initAddBtnClick();
-    #end
-    #if($hasEdit)
-      //初始化编辑记录按钮点击事件
-      this.initEditBtnClick();
-    #end
-    #if($hasDelete)
-      // 初始化删除记录按钮点击事件
-      this.initRemoveBtnClick();
-    #end
+#end
+#if($hasAdd)
+    //初始化新增记录按钮点击事件
+    this.initAddBtnClick();
+#end
+#if($hasEdit)
+    //初始化编辑记录按钮点击事件
+    this.initEditBtnClick();
+#end
+#if($hasDelete)
+    // 初始化删除记录按钮点击事件
+    this.initRemoveBtnClick();
+#end
   },
   initTable: function () {
     var that = this;
-    this.\$table.bootstrapTable({
-      //服务器数据的加载地址
-      url: ctx + '/${functionName}/list',
+    //服务器数据的加载地址
+    this['$table'].bootstrapTable({
+      url: ctx +'/${functionName}/list',
       //指定主键列
       idField: 'id',
       //默认排序为按创建时间降序排列
@@ -72,14 +74,14 @@ var ${functionName}_index_pager = {
       sortOrder: 'desc',
       queryParams: function (params) { //传递参数
         //native params : pageSize, pageNumber, searchText, sortName, sortOrder.
-        var queryParams = \$.serializeObject(that.\$searchForm);
+        var queryParams = $.serializeObject(that['$searchForm']);
         var pageParams = {
           pageSize: params.pageSize,
           pageNumber: params.pageNumber,
           orderBy: params.sortName,
           orderType: params.sortOrder
         };
-        return \$.extend(queryParams, pageParams);
+        return $.extend(queryParams, pageParams);
       },
       toolbar: '#toolbar',
       columns: [
@@ -88,26 +90,26 @@ var ${functionName}_index_pager = {
          checkbox: true
          }, */
         #foreach($column in $columns)
-        {
-          field: '${column.name}',
-          title: '${column.showName}',
-          #if($column.sort)
-            sortable: true,
-          #end
-          #if($column.hidden)
-            visible: false
-          #end
-          #if($column.formatter)
-            formatter: function (value, row, index) {
-              for(var i = 0; i < that.options.${column.name}EnumList.length; i++) {
-                var type = that.options.${column.name}EnumList[i];
-                if (type.code == value) {
-                  return type.name;
+          {
+            field: '${column.name}',
+            title: '${column.showName}',
+            #if($column.sort)
+              sortable: true,
+            #end
+            #if($column.hidden)
+              visible: false
+            #end
+            #if($column.formatter)
+              formatter: function (value, row, index) {
+                for(var i = 0; i < that.options.${column.name}EnumList.length; i++) {
+                  var type = that.options.${column.name}EnumList[i];
+                  if (type.code == value) {
+                    return type.name;
+                  }
                 }
               }
-            }
-          #end
-        },
+            #end
+          },
         #end
         {
           field: 'action',
@@ -115,16 +117,16 @@ var ${functionName}_index_pager = {
           formatter: function (value, row, index) {
             var str = '';
             if (that.options.isHasEdit) {
-              str += \$.formatString('<a style="margin: 1px;" href="javascript:void(0);" onclick="${functionName}_index_pager.clickEdit(\'{0}\',\'{1}\');" title="编辑"> 编辑 </a>', row.id, index);
+              str += $.formatString('<a style="margin: 1px;" href="javascript:void(0);" onclick="${functionName}_index_pager.clickEdit(\'{0}\',\'{1}\');" title="编辑"> 编辑 </a>', row.id, index);
             }
             if (that.options.isHasChangeStatus) {
-              str += \$.formatString('<a style="margin: 1px;" href="javascript:void(0);" onclick="${functionName}_index_pager.clickChangeStatus(\'{0}\',\'{1}\',\'{2}\');" title="状态修改"> 状态修改 </a>', row.id, row.status, index);
+              str += $.formatString('<a style="margin: 1px;" href="javascript:void(0);" onclick="${functionName}_index_pager.clickChangeStatus(\'{0}\',\'{1}\',\'{2}\');" title="状态修改"> 状态修改 </a>', row.id, row.status, index);
             }
             if (that.options.isHasDetail) {
-              str += \$.formatString('<a style="margin: 1px;" href="javascript:void(0);" onclick="${funtionName}_index_pager.clickDetail(\'{0}\',\'{1}\');" title="查看報文內容"> 查看報文內容 </a>', row.id, index);
+              str += $.formatString('<a style="margin: 1px;" href="javascript:void(0);" onclick="${funtionName}_index_pager.clickDetail(\'{0}\',\'{1}\');" title="查看報文內容"> 查看報文內容 </a>', row.id, index);
             }
             if (that.options.isHasDelete) {
-              str += \$.formatString('<a style="margin: 1px;" href="javascript:void(0);" onclick="${functionName}_index_pager.clickDelete(\'{0}\');" title="删除"> 删除 </a>', row.id);
+              str += $.formatString('<a style="margin: 1px;" href="javascript:void(0);" onclick="${functionName}_index_pager.clickDelete(\'{0}\');" title="删除"> 删除 </a>', row.id);
             }
             return str;
           }
@@ -133,95 +135,4 @@ var ${functionName}_index_pager = {
       }
     });
   },
-  initSearchForm: function () {
-  },
-  initSearchQueryBtnClick: function () {
-    var that = this;
-    this.toolbar.\$searchBtn.click(function () {
-      var d = that.\$table.bootstrapTable('getData');
-      if (d.length == 0) {
-        that.\$table.bootstrapTable('refresh');
-        return;
-      }
-      that.\$table.bootstrapTable('selectPage', 1);
-      //that.\$table.bootstrapTable('refresh');
-    });
-  },
-  initSearchResetBtnClick: function () {
-    var that = this;
-    this.toolbar.\$searchResetBtn.click(function () {
-      that.\$searchForm.clearForm();
-      \$('.selectpicker').selectpicker('render');
-      \$('.input-daterange').find('input').datepicker('clearDates');
-    });
-  }
-  /*initSearchExportBtnClick: function() {
-   var that = this;
-   this.toolbar.\$searchExportBtn.click(function() {
-   that.\$searchForm.attr('action', ctx + '/bcmApiLog/exportExcel');
-   that.\$searchForm.submit();
-   });
-   }*/
-  #if($hasAdd)
-  , clickAdd: function() {
-    var that = this;
-    this.toolbar.\$addBtn.on('click', function() {
-      \$('body').modalmanager('loading');
-      setTimeout(function() {
-        that.\$addDialog.load(ctx + '/${functionName}/add', '', function() {
-          that.\$addDialog.modal();
-        }, 100)
-      })
-    })
-  }
-  #end
-  #if($hasEdit)
-  , clickEdit: function(id, rowIndex) {
-    var that = this;
-    this.toolbar.\$removeBtn.on('click', function() {
-      \$('body').modalmanager('loading');
-      setTimeout(function() {
-        that.\$editDialog.load(ctx + '/${functionName}/edit/' + id + '?rowIndex=' +rowIndex, function() {
-          that.$editDialog.modal();
-        });
-      }, 100)
-    })
-  }
-  #end
-  #if($hasDetail)
-  , clickDetail: function (id, rowIndex) {
-    var that = this;
-    that.\$detailDialog.load(ctx + '/${functionName}/detail/' + id, function () {
-      that.\$detailDialog.modal("show")
-    });
-  }
-  #end
-  #if($hasDelete)
-  , clickDelete: function(id) {
-    var that = this;
-    messager.confirm({
-      text: '確認要刪除記錄嗎？',
-      callback: function() {
-        \$.addLoading();
-        \$.post(ctx + '/${functionName}/delete/' + id, function(r) {
-          \$.removeLoading();
-          if (r && r.success) {
-            //刪除对应的行记录数据
-            that.\$table.bootstrapTable('remove', {
-            field: 'id',
-            values: id.split(',')
-            });
-            messager.notify({
-              text: r.msg
-            });
-          } else {
-            messager.alert({
-              text: r.msg
-            });
-          }
-        }, 'json');
-      }
-    })
-  }
-  #end
 };

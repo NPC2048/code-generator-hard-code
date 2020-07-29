@@ -1,13 +1,11 @@
 {
-  "genPath": "D:/temp",
+  "genPath": "F:\\eclipse-project\\bcm-h2h\\branches\\src-1.0.1",
   "javaPath": "src/main/java",
   "htmlPath": "src/main/webapp/WEB-INF/pages",
-  "jsPath": "src/main/webapp/WEB-INF/static",
+  "jsPath": "src/main/webapp/WEB-INF/static/js/pages",
   "author": "npc2048",
   "tableComment": "tableComment",
   "packageName": "com.bcm.h2h",
-  "moduleName": "ApiTest",
-  "commName": "apiTest",
   "tableName": "api_test",
   "businessName": "apiTest",
   "functionName": "api测试",
@@ -62,6 +60,10 @@
       "path": "vm/html/index.html.vm",
       "moduleName": "bcm-h2h-web",
       "fileName": "{}/index.jsp"
+    },{
+      "path": "vm/html/js/index.js.vm",
+      "moduleName": "bcm-h2h-web",
+      "fileName": "{}/index.js"
     },
     {
       "path": "vm/html/add.jsp.vm",

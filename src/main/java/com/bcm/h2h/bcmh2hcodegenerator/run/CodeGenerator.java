@@ -35,6 +35,9 @@ public class CodeGenerator {
     public static String vmJsonPath = "gen-config/vm.json";
 
     public static String genJsonPath = "gen-config/gen.json";
+
+    public static String customJsonPath = "gen-config/custom.json";
+
     /**
      * 变量
      */
@@ -84,8 +87,11 @@ public class CodeGenerator {
         // 读取 gen 的配置, 并做预处理
         JSONObject gen = readVmJson(genJsonPath);
         System.out.println(gen);
+        // 读取自定义变量
+        JSONObject custom = readVmJson(customJsonPath);
         // 与 global 合并
         global.putAll(gen);
+        global.putAll(custom);
         config = global;
         System.out.println(config);
     }

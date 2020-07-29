@@ -30,38 +30,38 @@
           <div class="row">
             <!-- Search Form Main -->
             <form id="searchForm" class="form-horizontal" action="#" method="post" autocomplete="off">
-              #foreach($column in $columns)
-              <div class="col-md-4 col-sm-12 col-xs-12 form-group">
-                <label class="control-label col-md-3 col-sm-3 col-xs-12">${column.comment}</label>
-                <div class="col-md-9 col-sm-9 col-xs-12 ">
-                  #if($column.formType == 'scope')
-                    #if($column.type == 'Date')
-                      <div class="input-group input-daterange" data-provide="datepicker">
-                    #else
-                      <div class="input-group">
-                    #end
-                    <input type="text" class="form-control" name="${column.name}Begin" value="" placeholder="開始">
-                    <div class="input-group-addon">-</div>
-                    <input type="text" class="form-control" name="${column.name}End" value="" placeholder="結束">
-                  </div>
-                  #elseif($column.formType == 'select')
-                    <select class="form-control selectpicker show-menu-arrow show-tick" name="operationType" title="請選擇" data-live-search="true">
-                      <option value="" selected>請選擇</option>
-                      <c:forEach items="\${${column.name}Enums}" var="type">
-                        <option value="\${type}">\${transType.name}</option>
-                      </c:forEach>
-                    </select>
-                  #elseif($column.formType == 'datetime')
-                    <div class="input-group input-daterange" data-provide="datepicker">
-                      <input type="text" class="form-control" name="${column.name}" value="" placeholder="請選擇日期">
-                    </div>
-                  #else
-                    <input type="text" class="form-control" name="${column.name}" value="" placeholder="請輸入${column.showName}">
-                  #end
-                  </div>
-                </div>
-              </div>
-              #end
+#foreach($column in $columns)
+<div class="col-md-4 col-sm-12 col-xs-12 form-group">
+  <label class="control-label col-md-3 col-sm-3 col-xs-12">${column.comment}</label>
+  <div class="col-md-9 col-sm-9 col-xs-12 ">
+    #if($column.formType == 'scope')
+      #if($column.type == 'Date')
+        <div class="input-group input-daterange" data-provide="datepicker">
+      #else
+        <div class="input-group">
+      #end
+      <input type="text" class="form-control" name="${column.name}Begin" value="" placeholder="開始">
+      <div class="input-group-addon">-</div>
+      <input type="text" class="form-control" name="${column.name}End" value="" placeholder="結束">
+    </div>
+    #elseif($column.formType == 'select')
+      <select class="form-control selectpicker show-menu-arrow show-tick" name="operationType" title="請選擇" data-live-search="true">
+        <option value="" selected>請選擇</option>
+        <c:forEach items="\${${column.name}Enums}" var="type">
+          <option value="\${type}">\${transType.name}</option>
+        </c:forEach>
+      </select>
+    #elseif($column.formType == 'datetime')
+      <div class="input-group input-daterange" data-provide="datepicker">
+        <input type="text" class="form-control" name="${column.name}" value="" placeholder="請選擇日期">
+      </div>
+    #else
+      <input type="text" class="form-control" name="${column.name}" value="" placeholder="請輸入${column.showName}">
+    #end
+    </div>
+  </div>
+</div>
+#end
               <div class="form-group">
                 <div class="col-md-7 col-sm-7 col-xs-9 col-md-offset-5 col-sm-offset-5 col-xs-offset-3 ">
                   <button id="searchResetBtn" class="btn btn-default resetBtn" type="button">重置
@@ -119,7 +119,7 @@
 <!-- /changePassword dialog -->
 <%@include file="/WEB-INF/pages/commons/incjs.jsp" %>
 <!-- Custom index Scripts -->
-<script src="${ctx}/static/js/pages/${viewPath}/index.js?v=1"></script>
+<script src="${ctx}/static/js/pages/${businessName}/index.js?v=1"></script>
 <script type="text/javascript">
 #if($hasAdd)
   var isHasAdd = false;
