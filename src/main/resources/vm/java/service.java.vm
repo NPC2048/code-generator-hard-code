@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.service.IService;
 import com.bcm.h2h.core.bean.Pager;
 import ${packageName}.entity.${ClassName};
 import ${packageName}.form.${ClassName}Form;
+import ${packageName}.model.${ClassName}Model;
 
 /**
  * ${functionName}Service接口
@@ -23,5 +24,26 @@ public interface ${ClassName}Service extends IService<${ClassName}> {
      * @return Page<${ClassName}Model>
      */
     Page<${ClassName}Model> pageList(Pager pager, ${ClassName}Form form);
+
+    /**
+    * 保存 ${functionName}Model
+    * @param model model
+    * @return boolean
+    */
+    boolean save(${ClassName}Model model);
+
+    /**
+    * 更新${functionName}Model
+    * @param model model
+    * @return boolean
+    */
+    boolean update(${ClassName}Model model);
+
+    /**
+    * 根据 id 查询 ${functionName} Model
+    * @param id id
+    * @return ${ClassName}Model
+    */
+    ${ClassName}Model getModelById(Long id);
 
 }

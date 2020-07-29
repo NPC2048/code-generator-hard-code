@@ -1,32 +1,76 @@
 package ${packageName}.service.impl;
 
 import java.util.List;
-    #foreach ($column in $columns)
-        #if($column.javaField == 'createTime' || $column.javaField == 'updateTime')
-        import com.ruoyi.common.utils.DateUtils;
-            #break
-        #end
-    #end
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import ${packageName}.mapper.${ClassName}Mapper;
+import com.baomidou.mybatisplus.plugins.Page;
+import com.bcm.h2h.core.base.BaseServiceImpl;
+import com.bcm.h2h.core.bean.Pager;
+import ${packageName}.dao.mapper.${ClassName}Mapper;
 import ${packageName}.entity.${ClassName};
+import ${packageName}.form.${ClassName}Form;
+import ${packageName}.model.${ClassName}Model;
 import ${packageName}.service.${ClassName}Service;
-import com.ruoyi.common.core.text.Convert;
+import com.bcm.h2h.core.spring.util.BeanUtils;
+import org.springframework.stereotype.Service;
 
+#foreach($column in $columns)
+#if($column.name =='createTime' || $column.name == 'updateTime')
+import java.util.Date;
+#break
+#end
+#end
 /**
  * ${functionName}Service业务层处理
  *
  * @author ${author}
  * @date ${datetime}
  */
-@Service
+@Service("${className}Service")
 public class ${ClassName}ServiceImpl extends BaseServiceImpl<${ClassName}Mapper, ${ClassName}> implements ${ClassName}Service {
 
+    @Override
     public Page<${ClassName}Model> pageList(Pager pager, ${ClassName}Form form) {
         Page<${ClassName}Model> page = this.initQueryPage(pager);
         page.setRecords(this.baseMapper.selectModelList(page, form));
         return page;
+    }
+
+    @Override
+    public boolean save(${ClassName}Model model) {
+#foreach($column in $columns)
+#if($column.name == 'createTime')
+        model.setCreateTime(new Date());
+#end
+#if($column.name =='updateTime')
+        model.setUpdateTime(new Date());
+#end
+#end
+        ${ClassName} entity = new ${ClassName}();
+        BeanUtils.copyNotNullProperties(model, entity);
+        boolean isSuccess = this.insert(entity);
+        BeanUtils.copyNotNullProperties(entity, model);
+        return isSuccess;
+    }
+
+    @Override
+    public boolean update(${ClassName}Model model) {
+#foreach($column in $columns)
+#if($column.name == 'updateTime')
+        model.setUpdateTime(new Date());
+#end
+#end
+        ${ClassName} entity = this.baseMapper.selectById(model.getId());
+        BeanUtils.copyNotNullProperties(model, entity);
+        boolean isSuccess = this.updateAllColumnById(entity);
+        BeanUtils.copyNotNullProperties(entity, model);
+        return isSuccess;
+    }
+
+    @Override
+    public ${ClassName}Model getModelById(Long id) {
+        ${ClassName}Model model = new ${ClassName}Model();
+        ${ClassName} entity = this.baseMapper.selectById(id);
+        BeanUtils.copyNotNullProperties(entity, model);
+        return model;
     }
 
 }

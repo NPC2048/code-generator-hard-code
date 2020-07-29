@@ -64,24 +64,24 @@ public class MainController {
         log.info("request body: " + json);
         JSONObject config = JSON.parseObject(json);
         // 初始化 velocity
-        List<String> templates = MyVelocityUtils.getTemplateList(config);
+//        List<String> templates = MyVelocityUtils.getTemplateList(config);
         VelocityInitializer.initVelocity();
         VelocityContext context = MyVelocityUtils.prepareContext(config);
 
         // 渲染变量到模板
-        for (String template : templates) {
-            StringWriter writer = new StringWriter();
-            Template tpl = Velocity.getTemplate(template, Constants.UTF8);
-            tpl.merge(context, writer);
-            // 添加到 zip
-            String str = MyVelocityUtils.getFileName(template, config);
-            System.out.println(str);
-            zipOutputStream.putNextEntry(new ZipEntry(MyVelocityUtils.getFileName(template, config)));
-            StreamUtils.copy(writer.toString(), StandardCharsets.UTF_8, zipOutputStream);
-//            IOUtils.closeQuietly(writer);
-            zipOutputStream.flush();
-//            zipOutputStream.close();
-        }
+//        for (String template : templates) {
+//            StringWriter writer = new StringWriter();
+//            Template tpl = Velocity.getTemplate(template, Constants.UTF8);
+//            tpl.merge(context, writer);
+//            // 添加到 zip
+//            String str = MyVelocityUtils.getFileName(template, config);
+//            System.out.println(str);
+//            zipOutputStream.putNextEntry(new ZipEntry(MyVelocityUtils.getFileName(template, config)));
+//            StreamUtils.copy(writer.toString(), StandardCharsets.UTF_8, zipOutputStream);
+////            IOUtils.closeQuietly(writer);
+//            zipOutputStream.flush();
+////            zipOutputStream.close();
+//        }
 
         byte[] data = byteStream.toByteArray();
         response.reset();

@@ -1,23 +1,34 @@
 {
   "columns": [
     {
-      "name": "id",
-      "upName": "Id",
-      "javaType": "Long",
-      "sqlType": "bigint",
-      "tableField": "id",
-      "formType": "text",
-      "queryType": "eq"
-    },
-    {
       "name": "state",
-      "upName": "State",
       "showName": "状态",
-      "type": "Integer",
+      "javaType": "Integer",
       "comment": "状态",
       "sqlType": "tinyint",
       "tableField": "state",
       "formType": "select"
+    },
+    {
+      "name": "createTime",
+      "showName": "创建日期",
+      "javaType": "Date",
+      "comment": "创建日期",
+      "sqlType": "datetime2",
+      "tableField": "create_time",
+      "formType": "date"
+    },
+    {
+      "name": "amount",
+      "showName": "金额",
+      "javaType": "BigDecimal",
+      "comment": "金额",
+      "sqlType": "decimal",
+      "len": 10,
+      "rate": 2,
+      "tableField": "amount",
+      "formType": "text",
+      "queryType": "between"
     }
   ]
 }

@@ -17,29 +17,12 @@ public class MyVelocityUtils {
      *
      * @return 模板列表
      */
-    public static List<Map.Entry<String, String>> getTemplateList(JSONObject config) {
-        List<Map.Entry<String, String>> templates = new ArrayList<>();
-        JSONObject vm = config.getJSONObject("vm");
-        Set<Map.Entry<String, Object>> set = vm.entrySet();
-        for (Map.Entry<String, Object> entry : set) {
-            System.out.println(entry.getKey() + ":" + entry.getValue());
-            Map.Entry<String, String> newEntry = new Map.Entry<String, String>() {
-                @Override
-                public String getKey() {
-                    return entry.getKey();
-                }
-
-                @Override
-                public String getValue() {
-                    return String.valueOf(entry.getValue());
-                }
-
-                @Override
-                public String setValue(String value) {
-                    return String.valueOf(entry.setValue(value));
-                }
-            };
-            templates.add(newEntry);
+    public static List<JSONObject> getTemplateList(JSONObject config) {
+        List<JSONObject> templates = new ArrayList<>();
+        JSONArray vm = config.getJSONArray("vm");
+        for (int i = 0; i < vm.size(); i++) {
+            JSONObject obj = vm.getJSONObject(i);
+            templates.add(obj);
         }
         return templates;
     }
@@ -51,34 +34,27 @@ public class MyVelocityUtils {
      */
     public static VelocityContext prepareContext(JSONObject object) {
 
-        String moduleName = object.getString("moduleName");
-        String businessName = object.getString("bussinessName");
-        String packageName = object.getString("packageName");
         String functionName = object.getString("functionName");
-        JSONArray importList = object.getJSONArray("importList");
-
+//        JSONArray importList = object.getJSONArray("importList");
+        Set<String> importList = getImportList(object);
         VelocityContext velocityContext = new VelocityContext();
         Set<Map.Entry<String, Object>> entrySet = object.entrySet();
         // 添加变量到 context
         for (Map.Entry<String, Object> entry : entrySet) {
             velocityContext.put(entry.getKey(), entry.getValue());
         }
-        velocityContext.put("root" , object);
-        velocityContext.put("tableName" , object.getString("tableName"));
-        velocityContext.put("functionName" , StringUtils.isNotEmpty(functionName) ? functionName : "【请填写功能名称】");
-        velocityContext.put("showName" , object.getString("showName"));
-        velocityContext.put("ClassName" , object.getString("ClassName"));
-        velocityContext.put("className" , StringUtils.uncapitalize(object.getString("ClassName")));
-        velocityContext.put("moduleName" , moduleName);
-        velocityContext.put("businessName" , businessName);
-        velocityContext.put("basePackage" , getPackagePrefix(packageName));
-        velocityContext.put("packageName" , packageName);
-        velocityContext.put("author" , object.getString("author"));
-        velocityContext.put("datetime" , DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"));
-        velocityContext.put("pkColumn" , object.getString("pkCoumn"));
-        velocityContext.put("importList" , importList == null ? null : importList.toArray());
+        velocityContext.put("config", object);
+        velocityContext.put("tableName", object.getString("tableName"));
+        velocityContext.put("functionName", StringUtils.isNotEmpty(functionName) ? functionName : "【请填写功能名称】");
+        velocityContext.put("showName", object.getString("showName"));
+        velocityContext.put("ClassName", object.getString("ClassName"));
+        velocityContext.put("className", StringUtils.uncapitalize(object.getString("ClassName")));
+        velocityContext.put("author", object.getString("author"));
+        velocityContext.put("datetime", DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        velocityContext.put("pkColumn", object.getString("pkCoumn"));
+        velocityContext.put("importList", importList.toArray());
 //        velocityContext.put("permissionPrefix" , getPermissionPrefix(moduleName, businessName));
-        velocityContext.put("columns" , object.getJSONArray("columns"));
+        velocityContext.put("columns", object.getJSONArray("columns"));
         return velocityContext;
     }
 
@@ -93,59 +69,61 @@ public class MyVelocityUtils {
         return StringUtils.substring(packageName, 0, lastIndex);
     }
 
-    public static String getFileName(String template, JSONObject config) {
-        // 项目路径
-        String projectPath = config.getString("projectPath");
-        // mybatis 路径
-        String templatesPath = config.getString("templatesPath");
-        // 包路径
-        String packageName = config.getString("packageName");
+    /**
+     * 从 vm list 获取对应模块名，文件名，生成绝对路径名
+     *
+     * @param vm
+     * @param config
+     * @return
+     */
+    public static String getFileName(JSONObject vm, JSONObject config) {
+        // 生成路径
+        String genPath = config.getString("genPath");
         // 模块名
-        String moduleName = config.getString("moduleName");
-        // 大写类名
-        String className = config.getString("className");
+        String moduleName = vm.getString("moduleName");
+        // 文件名
+        String fileName = vm.getString("fileName");
+
+        if (fileName.endsWith(".java") || fileName.endsWith("Mapper.xml")) {
+            // 大写类名
+            String className = config.getString("className");
+            // 基础包名替换为路径名
+            String packagePath = StringUtils.replace(config.getString("packageName"), ".", "/");
+            fileName = StringUtils.format(fileName, className);
+            return StringUtils.joinWith("/", genPath, moduleName, config.getString("javaPath"), packagePath, fileName);
+        }
         // 业务名称
         String businessName = config.getString("businessName");
+        fileName = StringUtils.format(fileName, businessName);
+        if (fileName.endsWith(".html") || fileName.endsWith(".jsp") || fileName.endsWith(".ftl")) {
+            return StringUtils.joinWith("/", genPath, moduleName, config.getString("htmlPath"), fileName);
+        }
+        if (fileName.endsWith(".js")) {
+            return StringUtils.joinWith("/", genPath, moduleName, config.getString("jsPath"), fileName);
+        }
+        if (fileName.endsWith(".sql")) {
+            return StringUtils.joinWith("/", genPath, moduleName, fileName);
+        }
+        throw new RuntimeException("未知文件格式处理类型: " + fileName);
+    }
 
-        String javaPath = projectPath + "/" + StringUtils.replace(packageName, "." , "/");
-        String mybatisPath = config.getString("mybatisPath") + "/" + moduleName;
-        String htmlPath = templatesPath + "/" + moduleName + "/" + businessName;
-        String jsPath = config.getString("jsPath");
-        String jspPath = config.getString("jspPath");
-        // 文件名称
-        String fileName = "" ;
-        if (template.contains("entity.java.vm")) {
-            fileName = StringUtils.format("{}/entity/{}.java" , javaPath, className);
+    public static Set<String> getImportList(JSONObject config) {
+        JSONArray columns = config.getJSONArray("columns");
+        Set<String> importList = new HashSet<>();
+        for (int i = 0; i < columns.size(); i++) {
+            JSONObject column = columns.getJSONObject(i);
+            String type = column.getString("javaType");
+            switch (type) {
+                case "Date":
+                    importList.add("java.util.Date");
+                    break;
+                case "BigDecimal":
+                    importList.add("java.math.BigDecimal");
+                    break;
+                default:
+            }
         }
-        if (template.contains("mapper.java.vm")) {
-            fileName = StringUtils.format("{}/mapper/{}Mapper.java" , javaPath, className);
-        } else if (template.contains("service.java.vm")) {
-            fileName = StringUtils.format("{}/service/I{}Service.java" , javaPath, className);
-        } else if (template.contains("serviceImpl.java.vm")) {
-            fileName = StringUtils.format("{}/service/impl/{}ServiceImpl.java" , javaPath, className);
-        } else if (template.contains("controller.java.vm")) {
-            fileName = StringUtils.format("{}/controller/{}Controller.java" , javaPath, className);
-        } else if (template.contains("mapper.xml.vm")) {
-            fileName = StringUtils.format("{}/{}Mapper.xml" , mybatisPath, className);
-        } else if (template.contains("form.java.vm")) {
-            fileName = StringUtils.format("{}/form/{}Form.java" , javaPath, className);
-        } else if (template.contains("model.java.vm")) {
-            fileName = StringUtils.format("{}/model/{}Model.java" , javaPath, className);
-        } else if (template.contains("index.vm")) {
-            return StringUtils.format("{}/index.jsp" , jspPath, businessName);
-        } else if (template.contains("index.js.vm")) {
-            return StringUtils.format("{}/index.js" , jsPath, businessName);
-        }
-        if (template.contains("list.html.vm")) {
-            fileName = StringUtils.format("{}/{}.html" , jspPath, businessName);
-        } else if (template.contains("add.html.vm")) {
-            fileName = StringUtils.format("{}/add.html" , jspPath);
-        } else if (template.contains("edit.html.vm")) {
-            fileName = StringUtils.format("{}/edit.html" , jspPath);
-        } else if (template.contains("sql.vm")) {
-            fileName = businessName + "Menu.sql" ;
-        }
-        return fileName;
+        return importList;
     }
 
 }

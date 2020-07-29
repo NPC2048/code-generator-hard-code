@@ -23,9 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -34,19 +32,9 @@ import java.util.Properties;
 @Slf4j
 public class CodeGenerator {
 
-    /**
-     * 全局配置文件路径
-     */
-    public static String globalConfig = "gen-config/vm.yml" ;
+    public static String vmJsonPath = "gen-config/vm.json";
 
-    /**
-     * 具体生成列信息配置文件路径
-     */
-    public static String genConfig = "gen-config/gen.yml" ;
-
-    public static String vmJsonPath = "gen-config/vm.json" ;
-
-    public static String genJsonPath = "gen-config/gen.json" ;
+    public static String genJsonPath = "gen-config/gen.json";
     /**
      * 变量
      */
@@ -56,29 +44,28 @@ public class CodeGenerator {
         // 初始化配置
         init();
         // 獲取模板列表
-        List<Map.Entry<String, String>> templates = MyVelocityUtils.getTemplateList(config);
+        List<JSONObject> vmList = MyVelocityUtils.getTemplateList(config);
+
         // 初始化 velocity
         VelocityInitializer.initVelocity();
         // 将变量放入 content
-        System.out.println(JSONObject.toJSONString(config));
+        log.info("config:" + config);
         VelocityContext context = MyVelocityUtils.prepareContext(config);
         // 渲染結果 list
-        List<String> result = new ArrayList<>(templates.size());
-        for (String template : templates) {
+        for (JSONObject vm : vmList) {
             //渲染模板
             StringWriter writer = new StringWriter();
-            Template tpl = Velocity.getTemplate(template, Constants.UTF8);
+            Template tpl = Velocity.getTemplate(vm.getString("path"), Constants.UTF8);
             tpl.merge(context, writer);
-            result.add(writer.toString());
-            String fileName = MyVelocityUtils.getFileName(template, config);
+            String fileName = MyVelocityUtils.getFileName(vm, config);
             // 输出到指定目录
-            Path outPath = Paths.get(config.getString("genPath") + "/" + fileName);
+            Path outPath = Paths.get(fileName);
             // 判断路径是存在, 不存在则创建
             Path parent = outPath.getParent();
             if (Files.notExists(parent)) {
                 Files.createDirectories(parent);
             }
-            log.info("write to : " + outPath);
+            log.info("生成 : " + vm.getString("path") + " 到 :" + outPath);
             FileCopyUtils.copy(writer.toString(), new PrintWriter(outPath.toFile()));
             log.info("write success");
         }
@@ -92,7 +79,7 @@ public class CodeGenerator {
         // 读取全局配置, 默认全局配置路径 classpath:/gen-config
         JSONObject global = readVmJson(vmJsonPath);
         // 将类名首字母小写，设置到 global properties 中
-        global.put("lowClassName" , StringUtils.uncapitalize(global.getString("className")));
+        global.put("lowClassName", StringUtils.uncapitalize(global.getString("className")));
         System.out.println(global);
         // 读取 gen 的配置, 并做预处理
         JSONObject gen = readVmJson(genJsonPath);

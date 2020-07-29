@@ -1,10 +1,9 @@
-<!DOCTYPE html>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@include file="/WEB-INF/pages/commons/taglibs.jsp" %>
+<!DOCTYPE html>
 <html lang="zh_CN">
-
 <head>
-  <title>${showName}</title>
+  <title>${functionName}</title>
   <%@include file="/WEB-INF/pages/commons/inc.jsp" %>
 </head>
 <body class="bgF6">
@@ -33,7 +32,7 @@
             <form id="searchForm" class="form-horizontal" action="#" method="post" autocomplete="off">
               #foreach($column in $columns)
               <div class="col-md-4 col-sm-12 col-xs-12 form-group">
-                <label class="control-label col-md-3 col-sm-3 col-xs-12">${column.showName}</label>
+                <label class="control-label col-md-3 col-sm-3 col-xs-12">${column.comment}</label>
                 <div class="col-md-9 col-sm-9 col-xs-12 ">
                   #if($column.formType == 'scope')
                     #if($column.type == 'Date')
@@ -85,10 +84,10 @@
       </div>
       <div class="fr titleBtn">
         <div class="tableCell">
-          <shiro:hasPermission name="${permissionPrefix}:add">
+          <shiro:hasPermission name="${businessName}:add">
             <button type="button" id="addBtn" class="btn btn-success infoBtn" data-toggle="modal" data-target="#myModal">新增</button>
           </shiro:hasPermission>
-          <shiro:hasPermission name="${permissionPrefix}:deleteByIds">
+          <shiro:hasPermission name="${businessName}:deleteByIds">
             <button id="removeBtn" class="btn btn-success infoBtn" href="javascript:void(0);">刪除
             </button>
           </shiro:hasPermission>
@@ -124,33 +123,33 @@
 <script type="text/javascript">
 #if($hasAdd)
   var isHasAdd = false;
-  <shiro:hasPermission name="${permissionPrefix}:add" >
+  <shiro:hasPermission name="${businessName}:add" >
     isHasAdd = true;
   </shiro:hasPermission>
 #end
 
 #if($hasDetail)
   var isHasDetail = false;
-  <shiro:hasPermission name="${permissionPrefix}:detail" >
+  <shiro:hasPermission name="${businessName}:detail" >
     isHasDetail = true;
   </shiro:hasPermission>
 #end
 
 #if($hasEdit)
   var isHasEdit = false;
-  <shiro:hasPermission name="${permissionPrefix}:edit" >
+  <shiro:hasPermission name="${businessName}:edit" >
     isHasAdd = true;
   </shiro:hasPermission>
 #end
 #if($hasChangeStatus)
   var isChangeStatus = false;
-  <shiro:hasPermission name="${permissionPrefix}:changeStatus" >
+  <shiro:hasPermission name="${businessName}:changeStatus" >
     isChangeStatus = true;
   </shiro:hasPermission>
 #end
 #if($hasDelete)
   var isHasDelete = false;
-  <shiro:hasPermission name="${permissionPrefix}:delete" >
+  <shiro:hasPermission name="${businessName}:delete" >
     isHasDelete = true;
   </shiro:hasPermission>
 #end
@@ -166,27 +165,27 @@
 #end
 
   $(function () {
-    ${functionName}_index_pager.init({
+    ${businessName}_index_pager.init({
       transTypeEnumList: transTypeEnumList,
       statusEnumList: statusEnumList,
-        #foreach($enum in $enumList)
-                ${enum}EnumList: ${enum}EnumList
-        #end
-        #if($hasDetail)
-          isHasDetail: isHasDetail,
-        #end
-        #if($hasAdd)
-          isHasAdd: isHasAdd,
-        #end
-        #if($hasEdit)
-          isHasEdit: isHasEdit,
-        #end
-        #if($hasDelete)
-          isHasDelete: isHasDelete
-        #end
-        #if($hasChangeStatus)
-          isChangeStatus: isChangeStatus
-        #end
+#foreach($enum in $enumList)
+${enum}EnumList: ${enum}EnumList
+#end
+#if($hasDetail)
+      isHasDetail: isHasDetail,
+#end
+#if($hasAdd)
+      isHasAdd: isHasAdd,
+#end
+#if($hasEdit)
+      isHasEdit: isHasEdit,
+#end
+#if($hasDelete)
+      isHasDelete: isHasDelete
+#end
+#if($hasChangeStatus)
+      isChangeStatus: isChangeStatus
+#end
     });
   });
 </script>

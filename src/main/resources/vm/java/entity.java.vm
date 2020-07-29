@@ -12,22 +12,38 @@ import ${import};
  */
 public class $ClassName {
 
-    #foreach ($column in $columns)
-        /**
-         * $column.comment
-         */
-        @TableField("${tableFiled}")
-        private ${column.type} ${column.name};
-    #end
+    private Long id;
 
-    #foreach($column in $columns)
-        public $column.javaType get${column.upName}() {
-            return $column.name;
-            }
+#foreach ($column in $columns)
+    /**
+     * $column.comment
+     */
+    @TableField("${column.tableField}")
+    private ${column.javaType} ${column.name};
 
-        public void set${column.upName}(${column.javaType} $column.name) {
-            this.$column.name = $column.name;
-            }
-    #end
+#end
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+#foreach($column in $columns)
+#if($column.name.length() > 2 && $column.name.substring(1,2).matches("[A-Z]"))
+    #set($upName=$column.name)
+#else
+    #set($upName=$column.name.substring(0,1).toUpperCase() + ${column.name.substring(1)})
+#end
+    public $column.javaType get${upName}() {
+        return $column.name;
+    }
+
+    public void set${upName}(${column.javaType} $column.name) {
+        this.$column.name = $column.name;
+    }
+
+#end
 }

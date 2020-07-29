@@ -1,0 +1,7 @@
+#macro(capitalize $str)
+  #if($str.length() > 2 && $str.substring(1,2).matches("[A-Z]"))
+    #set($upName=$str)
+  #else
+    #set($upName=$str.substring(0,1).toUpperCase() + $str.substring(1))
+  #end
+#end

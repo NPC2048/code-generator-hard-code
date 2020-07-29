@@ -1,6 +1,6 @@
 package ${packageName}.form;
 
-import ${packageForm}.BaseForm;
+import com.bcm.h2h.form.BaseForm;
 #foreach ($import in $importList)
 import ${import};
 #end
@@ -9,40 +9,76 @@ import javax.validation.constraints.*;
 #end
 
 /**
- * ${businessName}表单
+ * ${functionName}表单
  *
  * @author ${author}
  * @since ${datetime}
  */
 public class ${ClassName}Form extends BaseForm {
 
-    #foreach($column in $columns)
-        /**
-         * $column.comment
-         */
-        #foreach($valid in $column.valids)
-        @${valid.type}(message = "${valid.failMessage}")
-        #end
+    private Long id;
+
+#foreach($column in $columns)
+#if($column.queryType == 'between')
+    /**
+     * ${column.comment}开始
+     */
+    private ${column.javaType} ${column.name}Begin;
+
+    /**
+     * ${column.comment}结束
+     */
+    private ${column.javaType} ${column.name}End;
+
+#else
+    /**
+     * $column.comment
+     */
     private ${column.javaType} ${column.name};
-    #end
 
-    #foreach($column in $columns)
-        public $column.javaType get${column.upName}() {
-            return $column.name;
-        }
+#end
+#end
 
-        public void set${column.upName}(${column.javaType} $column.name) {
-            this.$column.name = $column.name;
-        }
-    #end
-
-    @Override
-    public String toString() {
-        StringBuilder string = new StringBuilder("${ClassName}Form [");
-        #foreach($column in $columns)
-            string.append("${column.name}:").append(this.${column.name}).append(',');
-        #end
-        string.setCharAt(string.length() - 1, ']');
-        return string.toString();
+    public Long getId() {
+        return id;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+#foreach($column in $columns)
+#if($column.name.length() > 2 && $column.name.substring(1,2).matches("[A-Z]"))
+  #set($upName=$column.name)
+#else
+  #set($upName=$column.name.substring(0,1).toUpperCase() + ${column.name.substring(1)})
+#end
+#if($column.queryType == 'between')
+    public $column.javaType get${upName}Begin() {
+        return ${column.name}Begin;
+    }
+
+    public void set${upName}Begin($column.javaType ${column.name}Begin) {
+        this.${column.name}Begin = ${column.name}Begin;
+    }
+
+    public $column.javaType get${upName}End() {
+        return ${column.name}End;
+    }
+
+    public void set${upName}End($column.javaType ${column.name}End) {
+        this.${column.name}End = ${column.name}End;
+    }
+
+#else
+    public $column.javaType get${upName}() {
+        return $column.name;
+    }
+
+    public void set${upName}(${column.javaType} $column.name) {
+        this.$column.name = $column.name;
+    }
+
+#end
+#end
 }
