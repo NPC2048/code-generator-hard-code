@@ -24,7 +24,7 @@ var ${businessName}_index_pager = {
   $addBtn: $('#addBtn'),
 #end
 #if($hasEdit)
-  $removeBtn: $('#removeBtn')
+  $removeBtn: $('#removeBtn'),
 #end
 #if($hasDelete)
 
@@ -33,6 +33,7 @@ var ${businessName}_index_pager = {
   //\$searchExportBtn: \$('#searchExportBtn'),
 #end
   },
+  checkBoxList: [],
   isFisrtLoad: true, //标识是否首次打开页面,如果是,则不加载数据
   init: function (options) {
     //初始化参数
@@ -55,7 +56,7 @@ var ${businessName}_index_pager = {
 #end
 #if($hasEdit)
     //初始化编辑记录按钮点击事件
-    this.initEditBtnClick();
+    ## this.initEditBtnClick();
 #end
 #if($hasDelete)
     // 初始化删除记录按钮点击事件
@@ -66,14 +67,13 @@ var ${businessName}_index_pager = {
     var that = this;
     //服务器数据的加载地址
     this['$table'].bootstrapTable({
-      url: ctx +'/${functionName}/list',
+      url: ctx +'/${businessName}/list',
       //指定主键列
       idField: 'id',
       //默认排序为按创建时间降序排列
       sortName: 'createTime',
       sortOrder: 'desc',
       queryParams: function (params) { //传递参数
-        //native params : pageSize, pageNumber, searchText, sortName, sortOrder.
         var queryParams = $.serializeObject(that['$searchForm']);
         var pageParams = {
           pageSize: params.pageSize,
@@ -84,55 +84,219 @@ var ${businessName}_index_pager = {
         return $.extend(queryParams, pageParams);
       },
       toolbar: '#toolbar',
-      columns: [
-        /*{
-         field: 'checkbox',
-         checkbox: true
-         }, */
-        #foreach($column in $columns)
-          {
-            field: '${column.name}',
-            title: '${column.showName}',
-            #if($column.sort)
-              sortable: true,
-            #end
-            #if($column.hidden)
-              visible: false
-            #end
-            #if($column.formatter)
-              formatter: function (value, row, index) {
-                for(var i = 0; i < that.options.${column.name}EnumList.length; i++) {
-                  var type = that.options.${column.name}EnumList[i];
-                  if (type.code == value) {
-                    return type.name;
-                  }
-                }
-              }
-            #end
-          },
-        #end
-        {
-          field: 'action',
-          title: '操作',
-          formatter: function (value, row, index) {
-            var str = '';
-            if (that.options.isHasEdit) {
-              str += $.formatString('<a style="margin: 1px;" href="javascript:void(0);" onclick="${functionName}_index_pager.clickEdit(\'{0}\',\'{1}\');" title="编辑"> 编辑 </a>', row.id, index);
-            }
-            if (that.options.isHasChangeStatus) {
-              str += $.formatString('<a style="margin: 1px;" href="javascript:void(0);" onclick="${functionName}_index_pager.clickChangeStatus(\'{0}\',\'{1}\',\'{2}\');" title="状态修改"> 状态修改 </a>', row.id, row.status, index);
-            }
-            if (that.options.isHasDetail) {
-              str += $.formatString('<a style="margin: 1px;" href="javascript:void(0);" onclick="${funtionName}_index_pager.clickDetail(\'{0}\',\'{1}\');" title="查看報文內容"> 查看報文內容 </a>', row.id, index);
-            }
-            if (that.options.isHasDelete) {
-              str += $.formatString('<a style="margin: 1px;" href="javascript:void(0);" onclick="${functionName}_index_pager.clickDelete(\'{0}\');" title="删除"> 删除 </a>', row.id);
-            }
-            return str;
+      columns: [{
+        field: 'checkbox',
+        checkbox: true,
+        formatter: function (value, row, index) {
+          if ($.inArray(row.id, that.checkBoxList) != -1) {
+            return {
+              checked: true
+            };
           }
-        }],
+        }
+#foreach($column in $columns)
+      }, {
+        field: '${column.name}',
+        title: '${column.comment}',
+#if($column.sort)
+        sortable: true,
+#end
+#if($column.hidden)
+        visible: false
+#end
+#if($column.formatter)
+        formatter: function (value, row, index) {
+          for(var i = 0; i < that.options.${column.name}EnumList.length; i++) {
+            var type = that.options.${column.name}EnumList[i];
+            if (type.code == value) {
+              return type.name;
+            }
+          }
+        }
+#end
+#end
+      }, {
+        field: 'action',
+        title: '操作',
+        formatter: function (value, row, index) {
+          var str = '';
+          if (that.options.isHasEdit) {
+            str += $.formatString('<a style="margin: 1px;" href="javascript:void(0);" onclick="${businessName}_index_pager.clickEdit(\'{0}\',\'{1}\');" title="编辑"> 编辑 </a>', row.id, index);
+          }
+          if (that.options.isHasChangeStatus) {
+            str += $.formatString('<a style="margin: 1px;" href="javascript:void(0);" onclick="${businessName}_index_pager.clickChangeStatus(\'{0}\',\'{1}\',\'{2}\');" title="状态修改"> 状态修改 </a>', row.id, row.status, index);
+          }
+          if (that.options.isHasDetail) {
+            str += $.formatString('<a style="margin: 1px;" href="javascript:void(0);" onclick="${businessName}_index_pager.clickDetail(\'{0}\',\'{1}\');" title="详情"> 详情 </a>', row.id, index);
+          }
+          if (that.options.isHasDelete) {
+            str += $.formatString('<a style="margin: 1px;" href="javascript:void(0);" onclick="${businessName}_index_pager.clickDelete(\'{0}\');" title="删除"> 删除 </a>', row.id);
+          }
+          return str;
+        }
+      }],
+      onCheck: function (row) {
+        that.checkBoxList.push(row.id);
+      },
+      onUncheck: function (row) {
+        that.checkBoxList.splice($.inArray(row.id, that.checkBoxList), 1);
+      },
+      onCheckAll: function (rows) {
+        for (var i = 0; i < rows.length; i++) {
+          if ($.inArray(rows[i].id, that.checkBoxList) == -1) { //未曾选过才加进去
+            that.checkBoxList.push(rows[i].id);
+          }
+        }
+      },
+      onUncheckAll: function (rows) {
+        for (var i = 0; i < rows.length; i++) {
+          that.checkBoxList.splice($.inArray(rows[i].id, that.checkBoxList), 1);
+        }
+      },
       onLoadSuccess: function (data) {
       }
     });
   },
+  initSearchForm: function () {
+  },
+  initSearchQueryBtnClick: function () {
+    var that = this;
+    this.toolbar['$searchBtn'].click(function () {
+      var d = that.$table.bootstrapTable('getData');
+      if (d.length == 0) {
+        that.$table.bootstrapTable('refresh');
+        return;
+      }
+      that.$table.bootstrapTable('selectPage', 1);
+      //that.\$table.bootstrapTable('refresh');
+    });
+  },
+  initSearchResetBtnClick: function () {
+    var that = this;
+    this.toolbar['$searchResetBtn'].click(function () {
+      that.$searchForm.clearForm();
+        $('.selectpicker').selectpicker('render');
+        $('.input-daterange').find('input').datepicker('clearDates');
+    });
+  },
+  initAddBtnClick: function() {
+    var that = this;
+    this.toolbar['$addBtn'].on('click', function() {
+      $('body').modalmanager('loading');
+        setTimeout(function() {
+          that['$addDialog'].load(ctx + '/${businessName}/add', '', function() {
+          that.$addDialog.modal();
+        });
+        }, 100);
+      });
+  },
+  initRemoveBtnClick: function() {
+    var that = this;
+    this.toolbar['$removeBtn'].click(function() {
+      console.log(that.checkBoxList)
+      if (that.checkBoxList.length > 0) {
+        messager.confirm({
+          text: '确认要删除记录吗?',
+          icon: 'info',
+          callback: function() {
+            $.addLoading();
+            var ids = that.checkBoxList.join(',');
+            $.post(ctx + '/${businessName}/deleteByIds', {
+              ids: ids
+            }, function(r) {
+              $.removeLoading();
+              if (r && r.success) {
+                that['$table'].bootstrapTable('remove', {
+                  field: 'id',
+                  values: that.checkBoxList
+                });
+                messager.notify({
+                  text: r.msg
+                });
+                //刪除成功清空數組
+                that.checkBoxList.splice(0, that.checkBoxList.length);
+              } else {
+                messager.alert({
+                  text: r.msg
+                });
+              }
+            }, 'json');
+          }
+        });
+      } else {
+        messager.alert({
+          text: '请选择要删除的记录'
+        });
+      }
+    });
+  },
+  /*initSearchExportBtnClick: function() {
+   var that = this;
+   this.toolbar['$searchExportBtn'].click(function() {
+   that['$searchForm'].attr('action', ctx + '/bcmApiLog/exportExcel');
+   that['$searchForm'].submit();
+   });
+   }*/
+#if($hasAdd)
+  clickAdd: function() {
+    var that = this;
+    this.toolbar['$addBtn'].on('click', function() {
+    $('body').modalmanager('loading');
+      setTimeout(function() {
+        that['$addDialog'].load(ctx + '/${businessName}/add', '', function() {
+          that.$addDialog.modal();
+        }, 100)
+      })
+    })
+  },
+#end
+#if($hasEdit)
+  clickEdit: function(id, rowIndex) {
+    var that = this;
+    this.toolbar['$removeBtn'].on('click', function() {
+    $('body').modalmanager('loading');
+      setTimeout(function() {
+        that['$editDialog'].load(ctx + '/${businessName}/edit/' + id + '?rowIndex=' +rowIndex, function() {
+          that.$editDialog.modal();
+        });
+      }, 100)
+    })
+  },
+#end
+#if($hasDetail)
+  clickDetail: function (id, rowIndex) {
+    var that = this;
+    that['$detailDialog'].load(ctx + '/${businessName}/detail/' + id, function () {
+      that.$detailDialog.modal("show")
+    });
+  }
+#end
+#if($hasDelete)
+  , clickDelete: function(id) {
+    var that = this;
+    messager.confirm({
+      text: '確認要刪除記錄嗎？',
+      callback: function() {
+        $.addLoading();
+        $.post(ctx + '/${businessName}/delete/' + id, function(r) {
+          $.removeLoading();
+          if (r && r.success) {
+            //刪除对应的行记录数据
+            that['$table'].bootstrapTable('remove', {
+              field: 'id',
+              values: [parseInt(id)]
+            });
+            messager.notify({
+              text: r.msg
+            });
+          } else {
+            messager.alert({
+              text: r.msg
+            });
+          }
+        }, 'json');
+      }
+    })
+  }
+#end
 };

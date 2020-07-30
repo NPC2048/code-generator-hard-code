@@ -1,34 +1,30 @@
 package ${packageName}.web.controller;
 
-import java.util.List;
+#foreach($enum in $enumList)
+import ${importEnumPath}.$enum.value;
+#end
 
 import com.bcm.h2h.core.annotation.AjaxLoadPage;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
-import ${packageName}.entity.${ClassName};
-import ${packageName}.form.${ClassName}Form;
-import ${packageName}.model.${ClassName}Model;
-import ${packageName}.service.${ClassName}Service;
-import com.bcm.h2h.core.exception.BizExceiption;
-import javax.validation.Valid;
-
-import com.bcm.h2h.core.exception.BizExceiption;
-
 import com.bcm.h2h.core.annotation.Log;
 import com.bcm.h2h.core.bean.DataGrid;
 import com.bcm.h2h.core.bean.Json;
 import com.bcm.h2h.core.bean.Pager;
-import com.bcm.h2h.web.controller.BaseController;
-#if($table.crud)
-  #foreach($package in $crudPackages)
-  import $package;
-  #end
-#end
+import com.bcm.h2h.core.exception.BizExceiption;
+import ${packageName}.form.${ClassName}Form;
+import ${packageName}.model.${ClassName}Model;
+import ${packageName}.service.${ClassName}Service;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.validation.Valid;
 
 /**
  * ${functionName}Controller
@@ -47,22 +43,23 @@ public class ${ClassName}Controller extends BaseController {
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     public String index(ModelMap modelMap) {
         // 添加枚举类到 modelMap
-      #foreach( $elem in $enums)
-          modelMap.put("${elem.name}", ${elem}.values())
-      #end
+#foreach( $elem in $enumList)
+        modelMap.put("${elem.name}Enums", ${elem.value}.values());
+#end
         return "${businessName}/index";
     }
 
     /**
      * 查询${functionName}列表
      */
-    @RequiresPermissions("${commName}:list")
+    @RequiresPermissions("${businessName}:list")
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     @ResponseBody
     public DataGrid list(Pager pager, ${ClassName}Form form) {
         return toJsonDataGrid(this.${className}Service.pageList(pager, form));
     }
 
+#if($hasDetail)
     /**
      * 查看${functionName}详情
      * @param id id
@@ -70,19 +67,29 @@ public class ${ClassName}Controller extends BaseController {
      * @return detail
      */
     @AjaxLoadPage
+    @RequiresPermissions("${businessName}:detail")
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
     public String detail(@PathVariable Long id, ModelMap modelMap) {
         ${ClassName}Model model = ${className}Service.getModelById(id);
+#foreach( $elem in $enumList)
+        modelMap.put("${elem.name}", ${elem.value}.values());
+#end
         modelMap.put("model", model);
         return "${businessName}/detail";
     }
+#end
 
+#if($hasAdd)
     /**
      * 新增${functionName}
      */
     @AjaxLoadPage
+    @RequiresPermissions("${businessName}:add")
     @RequestMapping(value = "/add", method = RequestMethod.GET)
-    public String add() {
+    public String add(ModelMap modelMap) {
+#foreach( $elem in $enumList)
+        modelMap.put("${elem.name}", ${elem.value}.values());
+#end
         return "${businessName}/add";
     }
 
@@ -97,14 +104,16 @@ public class ${ClassName}Controller extends BaseController {
         boolean isSuccess = this.${className}Service.save(model);
         return Json.status(isSuccess, "新增成功", model);
     }
-
+#end
+#if($hasEdit)
     /**
      * 修改${functionName}
      */
     @AjaxLoadPage
+    @RequiresPermissions("${businessName}:edit")
     @RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
     public String edit(@PathVariable Long id, int rowIndex, ModelMap modelMap) {
-        ${ClassName}Model model = this.${className}Service.getModelById(id);
+            ${ClassName}Model model = this.${className}Service.getModelById(id);
         modelMap.put("model", model);
         // 返回对应的行索引
         modelMap.put("rowIndex", rowIndex);
@@ -122,7 +131,9 @@ public class ${ClassName}Controller extends BaseController {
         boolean isSuccess = this.${className}Service.update(model);
         return Json.status(isSuccess, "修改成功", model);
     }
+#end
 
+#if($hasChangeStatus)
     /**
      * 切換${functionName}狀態
      * @param id 實體類 id
@@ -139,7 +150,9 @@ public class ${ClassName}Controller extends BaseController {
         }
         return Json.success("狀態切換成功", model);
     }
+#end
 
+#if($hasDelete)
     /**
      * 删除${functionName}
      */
@@ -165,8 +178,9 @@ public class ${ClassName}Controller extends BaseController {
         }
         String[] idArr = ids.split(ids, ',');
         for (String id : idArr) {
-            ${className}Service.deleteById(id);
+            ${className}Service.deleteById(NumberUtils.toLong(id));
         }
         return Json.success("刪除成功");
     }
+#end
 }

@@ -15,6 +15,7 @@
   "hasEdit": true,
   "hasDelete": true,
   "hasDetail": true,
+  "hasChangeStatus": true,
   "vm": [
     {
       "path": "vm/java/entity.java.vm",
@@ -57,10 +58,16 @@
       "fileName": "form/{}Form.java"
     },
     {
+      "path": "vm/java/enum/enum.java.vm",
+      "moduleName": "bcm-h2h-common",
+      "fileName": "enums/{}Enum.java"
+    },
+    {
       "path": "vm/html/index.html.vm",
       "moduleName": "bcm-h2h-web",
       "fileName": "{}/index.jsp"
-    },{
+    },
+    {
       "path": "vm/html/js/index.js.vm",
       "moduleName": "bcm-h2h-web",
       "fileName": "{}/index.js"
@@ -69,6 +76,26 @@
       "path": "vm/html/add.jsp.vm",
       "moduleName": "bcm-h2h-web",
       "fileName": "{}/add.jsp"
+    },
+    {
+      "path": "vm/html/js/add.js.vm",
+      "moduleName": "bcm-h2h-web",
+      "fileName": "{}/add.js"
+    },
+    {
+      "path": "vm/html/edit.jsp.vm",
+      "moduleName": "bcm-h2h-web",
+      "fileName": "{}/edit.jsp"
+    },
+    {
+      "path": "vm/html/js/edit.js.vm",
+      "moduleName": "bcm-h2h-web",
+      "fileName": "{}/edit.js"
+    },
+    {
+      "path": "vm/html/detail.jsp.vm",
+      "moduleName": "bcm-h2h-web",
+      "fileName": "{}/detail.jsp"
     },
     {
       "path": "vm/sql/table.sql.vm",

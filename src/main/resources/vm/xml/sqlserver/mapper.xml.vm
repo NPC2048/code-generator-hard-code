@@ -14,38 +14,62 @@
     <!-- list model 查询 -->
     <select id="selectModelList" parameterType="${packageName}.form.${ClassName}Form" resultMap="ModelResultMap">
         SELECT
-        #foreach($column in $columns)
-            t.$column.tableField
-        #end FROM ${tableName}
+            t.id,
+#foreach($column in $columns)
+            t.$column.tableField #if($velocityCount != $columns.size()),#end
+
+#end
+        FROM ${tableName} t
         <where>
 #foreach($column in $columns)
 #set($type = $column.queryType)
-#end
 #if($type)
-    #if($type == 'between')
-        <if test="${column.name}Begin != null and ${column.name}Begin != '' and ${column.name}End != null and ${column.name}End != ''">
+#if($type == 'between')
+#if($column.javaType == 'Date')
+            <if test="${column.name}Begin != null and ${column.name}End != null">
                 and ${column.name} between #{${column.name}Begin} and #{${column.name}End}
             </if>
-    #else
-        <if test="$column.name != null #if($column.type == 'String') and $column.name != ''#end">
-                and $column.name
-        #if($type == 'like')
-            LIKE '%' + #{$column.name} + '%'
-        #elseif($type == 'eq')
-            = #{$column.name}
-        #elseif($type == 'ne')
-            != #{$column.name}
-        #elseif($type == 'gt')
-            > #{$column.name}
-        #elseif($type == 'gte')
-            >= #{$column.name}
-        #elseif($type == 'lt')
-            <![CDATA[ <]]> #{$column.name}
-        #elseif($type == 'lte')
-            <![CDATA[ <=]]> #{$column.name}
-        #end
-        </if>
-    #end
+#else
+            <if test="${column.name}Begin != null and ${column.name}Begin != '' and ${column.name}End != null and ${column.name}End != ''">
+                and ${column.name} between #{${column.name}Begin} and #{${column.name}End}
+            </if>
+#end
+#elseif($type == 'scope')
+#if($column.javaType == 'Date')
+            <if test="${column.name}Begin != null">
+                and ${column.name} >= #{${column.name}Begin}
+            </if>
+            <if test="${column.name}End != null">
+                and ${column.name} <![CDATA[ <=]]> #{${column.name}End}
+            </if>
+#else
+            <if test="${column.name}Begin != null and ${column.name}Begin != ''">
+                and ${column.name} >= #{${column.name}Begin}
+            </if>
+            <if test="${column.name}End != null and ${column.name}End != ''">
+                and ${column.name} <![CDATA[ <=]]> ${column.name}End
+            </if>
+#end
+#else
+            <if test="$column.name != null #if($column.type == 'String') and $column.name != ''#end">
+#if($type == 'like')
+                and $column.name LIKE '%' + #{$column.name} + '%'
+#elseif($type == 'eq')
+                and $column.name = #{$column.name}
+#elseif($type == 'ne')
+                and $column.name    != #{$column.name}
+#elseif($type == 'gt')
+                and $column.name   > #{$column.name}
+#elseif($type == 'gte')
+                and $column.name >= #{$column.name}
+#elseif($type == 'lt')
+                and $column.name <![CDATA[ <]]> #{$column.name}
+#elseif($type == 'lte')
+                and $column.name <![CDATA[ <=]]> #{$column.name}
+#end
+            </if>
+#end
+#end
 #end
     </where>
     </select>

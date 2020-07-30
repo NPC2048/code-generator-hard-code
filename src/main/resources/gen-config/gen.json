@@ -1,31 +1,82 @@
 {
+  "importEnumPath": "com.bcm.h2h.common.enums",
+  "enumList": [
+    {
+      "name": "status",
+      "value": "CommonStatusEnum"
+    }
+  ],
+  "enums": [
+    {
+      "className": "LanguageType",
+      "values": [
+        {
+          "NAME": "JAVA",
+          "code": 0,
+          "name": "JAVA"
+        }
+      ]
+    }
+  ],
   "columns": [
     {
-      "name": "state",
+      "name": "status",
+      "tableField": "status",
       "javaType": "Integer",
       "comment": "状态",
       "sqlType": "tinyint",
-      "tableField": "state",
-      "formType": "select"
+      "formQueryType": "select",
+      "formatter": true,
+      "queryType": "eq"
+    },
+    {
+      "name": "languageType",
+      "tableField": "language_type",
+      "javaType": "Integer",
+      "comment": "语言类型",
+      "sqlType": "tinyint",
+      "formQueryType": "select",
+      "queryType": "eq"
     },
     {
       "name": "createTime",
+      "tableField": "create_time",
       "javaType": "Date",
       "comment": "创建日期",
       "sqlType": "datetime2",
-      "tableField": "create_time",
-      "formType": "date"
+      "queryType": "scope",
+      "formType": "datetime",
+      "formQueryType": "scope"
     },
     {
       "name": "amount",
+      "tableField": "amount",
       "javaType": "BigDecimal",
       "comment": "金额",
       "sqlType": "decimal",
       "len": 10,
       "rate": 2,
-      "tableField": "amount",
       "formType": "text",
       "queryType": "between"
+    },
+    {
+      "name": "name",
+      "tableField": "name",
+      "javaType": "String",
+      "comment": "名称",
+      "sqlType": "nvarchar",
+      "len": 20,
+      "formType": "text",
+      "queryType": "like"
+    },
+    {
+      "name": "remark",
+      "tableField": "remark",
+      "javaType": "String",
+      "comment": "备注",
+      "sqlType": "ntext",
+      "formType": "textarea",
+      "queryType": "like"
     }
   ]
 }

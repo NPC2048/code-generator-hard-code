@@ -3,6 +3,7 @@ package com.bcm.h2h.bcmh2hcodegenerator.run;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.bcm.h2h.bcmh2hcodegenerator.common.constant.Constants;
+import com.bcm.h2h.bcmh2hcodegenerator.common.utils.DBUtils;
 import com.bcm.h2h.bcmh2hcodegenerator.common.utils.MyVelocityUtils;
 import com.bcm.h2h.bcmh2hcodegenerator.common.utils.VelocityInitializer;
 import com.bcm.h2h.bcmh2hcodegenerator.common.utils.YamlUtils;
@@ -23,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
 
@@ -43,7 +45,7 @@ public class CodeGenerator {
      */
     public static JSONObject config;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SQLException {
         // 初始化配置
         init();
         // 獲取模板列表
@@ -67,6 +69,10 @@ public class CodeGenerator {
             Path parent = outPath.getParent();
             if (Files.notExists(parent)) {
                 Files.createDirectories(parent);
+            }
+            if (vm.getString("path").contains("table.sql")) {
+                // 执行 sql
+                DBUtils.createTable(writer.toString());
             }
             log.info("生成 : " + vm.getString("path") + " 到 :" + outPath);
             FileCopyUtils.copy(writer.toString(), new PrintWriter(outPath.toFile()));

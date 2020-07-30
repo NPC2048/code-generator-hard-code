@@ -14,6 +14,6 @@ public enum FormType {
     TEXT,
     SELECT,
     DATETIME,
-    SCOPE
+    TEXTAREA,
 
 }

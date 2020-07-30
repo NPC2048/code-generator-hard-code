@@ -1,6 +1,10 @@
 package ${packageName}.entity;
 
 import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.enums.IdType;
+
 #foreach ($import in $importList)
 import ${import};
 #end
@@ -10,8 +14,10 @@ import ${import};
  * @author ${author}
  * @date ${datetime}
  */
+@TableName("${tableName}")
 public class $ClassName {
 
+    @TableId(type = IdType.AUTO)
     private Long id;
 
 #foreach ($column in $columns)

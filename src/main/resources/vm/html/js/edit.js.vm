@@ -1,0 +1,172 @@
+var server_config_edit_pager = {
+  options: {}, //参数options
+  $table: $('#table'), //boostrap table
+  $dialog: $('#editDialog'),
+  $editForm: $('#editForm'), // edit form
+  toolbar: {
+    $saveBtn: $('#editDialog .saveBtn'),
+    $resetBtn: $('#editDialog .resetBtn'),
+    $closeBtn: $('#editDialog .closeBtn')
+  },
+  init: function (options) {
+    //初始化参数
+    this.options = $.extend(this.options, options || {});
+    //初始化表单控件
+    this.initForm();
+    //初始化数据表单校验
+    this.initFormValidate();
+    //初始化保存按钮点击事件
+    this.initSaveBtnClick();
+    //初始化重置数据表单点击事件
+    this.initResetBtnClick();
+    //初始化关闭数据表单点击事件
+    this.initCloseBtnClick();
+  },
+  initForm: function () {
+    var that = this;
+    //异步加载时,selectpicker需要手动调用初始化
+    this.$editForm.find('.selectpicker').selectpicker();
+    //为每个selectpicker绑定当值改变时自动校验事件
+    this['$editForm'].find('.selectpicker').on('changed.bs.select', function (e) {
+    that['$editForm'].validate().element($(this));
+    });
+  },
+  initFormValidate: function () {
+    var that = this;
+    this['$editForm'].validate({
+      rules: {
+#foreach($column in $columns)
+#if($column.valids)
+        $column.name: {
+#foreach($valid in $column.valids)
+          $valid.type: $valid.value,
+#end
+        }
+#end
+#end
+      },
+      messages: {
+        type: {
+          serverConfigTypeIsOnly: "已存在該主機名稱"
+        }
+      },
+      errorElement: 'div',
+      errorPlacement: function (error, element) {
+      // Add the `help-block` class to the error element
+      error.addClass('help-block');
+      // Add `has-feedback` class to the parent div.form-group
+      // in order to add icons to inputs
+      element.parent().addClass('has-feedback');
+
+      if (element.prop('type') === 'checkbox') {
+      error.insertAfter(element.parent('label'));
+      } else if (element.is('select')) {
+      error.css('color', '#a94442');
+      error.insertAfter(element.parent());
+      //error.insertAfter(element);
+      } else {
+      error.insertAfter(element);
+      }
+      // Add the span element, if doesn't exists, and apply the icon classes to it.
+                    if (!element.next("span")[0]) {
+                        $("<span class='glyphicon glyphicon-remove form-control-feedback'></span>").insertAfter(element);
+                    }
+                },
+                success: function (label, element) {
+                    // Add the span element, if doesn't exists, and apply the icon classes to it.
+      if (!$(element).next("span")[0]) {
+        $("<span class='glyphicon glyphicon-ok form-control-feedback'></span>").insertAfter($(element));
+      }
+      },
+      highlight: function (element, errorClass, validClass) {
+        $(element).parent().addClass('has-error').removeClass('has-success');
+        $(element).next('span').addClass('glyphicon-remove').removeClass('glyphicon-ok');
+      },
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).parent().addClass('has-success').removeClass('has-error');
+        $(element).next('span').addClass('glyphicon-ok').removeClass('glyphicon-remove');
+      },
+      submitHandler: function () {
+      //add loading dialog
+      //$('.loader').removeClass('none');
+        $.addLoading();
+      /*var position=$("#position").val().join(",");
+        $("#positionInput").val(position);*/
+        $.post(ctx + '/serverConfig/edit/', $.serializeObject(that.$editForm), function (r) {
+        $.removeLoading();
+      if (r && r.success) {
+      messager.notify({
+      text: r.msg
+      });
+      //refresh table   bad way!!!
+      //that.$table.bootstrapTable('refresh');
+
+      //更新对应的行记录数据
+      that['$table.bootstrapTable']('updateRow', {
+        index: that.options.rowIndex,
+        row: r.obj
+      });
+      that.$table.bootstrapTable('refresh');
+      //隐藏对话框
+      that.$dialog.modal('hide');
+
+    } else {
+    messager.alert({
+    text: r.msg,
+    callback: function () {
+    //隐藏对话框
+    //that.$dialog.modal('hide');
+    }
+    });
+    }
+    }, 'json');
+    }
+    });
+  },
+  initSaveBtnClick: function () {
+    var that = this;
+    this.toolbar['$saveBtn'].click(function () {
+      that.$editForm.submit();
+    });
+  },
+  initResetBtnClick: function () {
+    var that = this;
+    this.toolbar['$resetBtn'].click(function () {
+      that.resetForm(that);
+    });
+  },
+  initCloseBtnClick: function () {
+    var that = this;
+    this.toolbar['$closeBtn'].click(function () {
+      that.resetForm(that);
+    });
+  },
+  /*---------------- util function start ----------------*/
+  resetForm: function (that) {
+    that.$editForm.resetForm();
+    that.$editForm.find('.has-feedback').removeClass('has-success has-error has-feedback');
+    that.$editForm.find('.help-block').remove();
+    that.$editForm.find('.form-control-feedback').remove();
+    that.$editForm.find('.selectpicker').selectpicker('render');
+  }
+};
+$.validator.addMethod("serverConfigTypeIsOnly", function (value, element) {
+  var typeIsOnly = false;
+  jQuery.ajax({
+    type: 'POST',
+    data: {
+      "type": value,
+      "id": $("#id").val()
+    },
+    url: ctx + '/serverConfig/verifyType',
+    contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
+    processType: false,
+    cache: false,
+    async: false, // 同步
+    dataType: "json",
+    success: function (data) {
+      typeIsOnly = data.obj;
+    }
+  });
+  return typeIsOnly;
+}, "已存在該主機名稱");

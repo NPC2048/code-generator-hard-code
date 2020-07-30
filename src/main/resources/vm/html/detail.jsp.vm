@@ -1,0 +1,31 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/pages/commons/taglibs.jsp"%>
+<div class="modal-body">
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table">
+                <caption>
+                    <h4>${functionName}详情</h4>
+                </caption>
+#foreach($column in $columns)
+                <tr>
+                    <td>
+                        <span>${column.comment}：</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+#if($column.formType == 'dateTime')
+#end
+#set($name='${model.' + $column.name + '}')
+                        <input class="form-control" readonly="readonly" value="$name">
+                    </td>
+                </tr>
+#end
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" data-dismiss="modal" class="btn btn-default closeBtn">关闭</button>
+</div>

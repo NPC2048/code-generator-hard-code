@@ -8,19 +8,26 @@ CREATE TABLE [dbo].[${tableName}] (
 #else
   #set($len='(' + $column.len + ')')
 #end
+#else
+  #set($len='')
 #end
   [$column.tableField] $column.sqlType$!{len},
 #end
 PRIMARY KEY CLUSTERED ([id])
 WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = OFF)
 )
-GO
+
+EXEC sp_addextendedproperty
+'MS_Description', N'主键',
+'SCHEMA', N'dbo',
+'TABLE', N'${tableName}',
+'COLUMN', N'id'
 
 #foreach($column in $columns)
 EXEC sp_addextendedproperty
 'MS_Description', N'${column.comment}',
 'SCHEMA', N'dbo',
 'TABLE', N'${tableName}',
-'COLUMN', N'id'
-GO
+'COLUMN', N'${column.tableField}'
+
 #end

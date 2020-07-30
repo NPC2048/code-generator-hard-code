@@ -1,0 +1,13 @@
+package ${packageName}.common.enums;
+
+/**
+ * @author ${author}
+ * @date ${datetime}
+ */
+public enum ${ClassName}Enum {
+
+    #foreach($column in $columns)
+      $column.NAME($velocityCount, "")
+    #end
+
+}

@@ -1,16 +1,16 @@
-var ${functionName}_add_pager = {
+var ${businessName}_add_pager = {
   options: {}, //参数options
-  \$table: \$('#table'), //boostrap table
-  \$dialog: \$('#addDialog'),
-  \$addForm: \$('#addForm'), // add form
+  $table: $('#table'), //boostrap table
+  $dialog: $('#addDialog'),
+  $addForm: $('#addForm'), // add form
   toolbar: {
-    \$saveBtn: \$('#addDialog .saveBtn'),
-    \$resetBtn: \$('#addDialog .resetBtn'),
-    \$closeBtn: \$('#addDialog .closeBtn')
+    $saveBtn: $('#addDialog .saveBtn'),
+    $resetBtn: $('#addDialog .resetBtn'),
+    $closeBtn: $('#addDialog .closeBtn')
   },
   init: function (options) {
     //初始化参数
-    this.options = \$.extend(this.options, options || {});
+    this.options = $.extend(this.options, options || {});
     //初始化表单控件
     this.initForm();
     //初始化数据表单校验
@@ -26,15 +26,15 @@ var ${functionName}_add_pager = {
   initForm: function () {
     var that = this;
     //异步加载时,selectpicker需要手动调用初始化
-    this.\$addForm.find('.selectpicker').selectpicker();
+    this.$addForm.find('.selectpicker').selectpicker();
     //为每个selectpicker绑定当值改变时自动校验事件
-    this.\$addForm.find('.selectpicker').on('changed.bs.select', function (e) {
-    that.\$addForm.validate().element(\$(this));
+    this['$addForm'].find('.selectpicker').on('changed.bs.select', function (e) {
+    that['$addForm'].validate().element($(this));
     });
   },
   initFormValidate: function () {
     var that = this;
-    this.\$addForm.validate({
+    this['$addForm'].validate({
       rules: {
         #foreach($column in $columns)
           #if($column.valid)
@@ -71,44 +71,44 @@ var ${functionName}_add_pager = {
           error.insertAfter(element);
         }
         if (!element.next("span")[0]) {
-          \$("<span class='glyphicon glyphicon-remove form-control-feedback'></span>").insertAfter(element);
+          $("<span class='glyphicon glyphicon-remove form-control-feedback'></span>").insertAfter(element);
         }
       },
       success: function (label, element) {
-        if (!\$(element).next("span")[0]) {
-            \$("<span class='glyphicon glyphicon-ok form-control-feedback'></span>").insertAfter(\$(element));
+        if (!$(element).next("span")[0]) {
+            $("<span class='glyphicon glyphicon-ok form-control-feedback'></span>").insertAfter($(element));
         }
       },
       highlight: function (element, errorClass, validClass) {
-        \$(element).parent().addClass('has-error').removeClass('has-success');
-        \$(element).next('span').addClass('glyphicon-remove').removeClass('glyphicon-ok');
+        $(element).parent().addClass('has-error').removeClass('has-success');
+        $(element).next('span').addClass('glyphicon-remove').removeClass('glyphicon-ok');
       },
       unhighlight: function (element, errorClass, validClass) {
-        \$(element).parent().addClass('has-success').removeClass('has-error');
-        \$(element).next('span').addClass('glyphicon-ok').removeClass('glyphicon-remove');
+        $(element).parent().addClass('has-success').removeClass('has-error');
+        $(element).next('span').addClass('glyphicon-ok').removeClass('glyphicon-remove');
       },
       submitHandler: function () {
-        \$.addLoading();
-        \$.post(ctx + '/serverConfig/add', \$.serializeObject(that.\$addForm), function (r) {
-          \$.removeLoading();
+        $.addLoading();
+        $.post(ctx + '/${businessName}/add', $.serializeObject(that.$addForm), function (r) {
+          $.removeLoading();
           if (r && r.success) {
           messager.notify({
             text: r.msg
           });
           //将新增记录插入至表格第一行
-          that.\$table.bootstrapTable('insertRow', {
+          that['$table'].bootstrapTable('insertRow', {
             index: 0,
             row: r.obj
           });
           //隐藏对话框
-          that.\$dialog.modal('hide');
-          that.\$table.bootstrapTable('refresh');
+          that.$dialog.modal('hide');
+          that.$table.bootstrapTable('refresh');
           } else {
             messager.alert({
               text: r.msg,
               callback: function () {
               //隐藏对话框
-              //that.\$dialog.modal('hide');
+              //that.$dialog.modal('hide');
               }
             });
           }
@@ -118,28 +118,28 @@ var ${functionName}_add_pager = {
   },
   initSaveBtnClick: function () {
     var that = this;
-    this.toolbar.\$saveBtn.click(function () {
-      that.\$addForm.submit();
+    this.toolbar['$saveBtn'].click(function () {
+      that.$addForm.submit();
     });
   },
   initResetBtnClick: function () {
     var that = this;
-    this.toolbar.\$resetBtn.click(function () {
+    this.toolbar['$resetBtn'].click(function () {
       that.resetForm(that);
     });
   },
   initCloseBtnClick: function () {
     var that = this;
-    this.toolbar.\$closeBtn.click(function () {
+    this.toolbar['$closeBtn'].click(function () {
       that.resetForm(that);
     });
   },
   resetForm: function (that) {
-    that.\$addForm.resetForm();
-    that.\$addForm.find('.has-feedback').removeClass('has-success has-error has-feedback');
-    that.\$addForm.find('.help-block').remove();
-    that.\$addForm.find('.form-control-feedback').remove();
-    that.\$addForm.find('.selectpicker').selectpicker('render');
+    that.$addForm.resetForm();
+    that.$addForm.find('.has-feedback').removeClass('has-success has-error has-feedback');
+    that.$addForm.find('.help-block').remove();
+    that.$addForm.find('.form-control-feedback').remove();
+    that.$addForm.find('.selectpicker').selectpicker('render');
 
   }
 };
