@@ -58,11 +58,6 @@
       "fileName": "form/{}Form.java"
     },
     {
-      "path": "vm/java/enum/enum.java.vm",
-      "moduleName": "bcm-h2h-common",
-      "fileName": "enums/{}Enum.java"
-    },
-    {
       "path": "vm/html/index.html.vm",
       "moduleName": "bcm-h2h-web",
       "fileName": "{}/index.jsp"

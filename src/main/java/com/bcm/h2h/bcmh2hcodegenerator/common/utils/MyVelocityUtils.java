@@ -2,14 +2,26 @@ package com.bcm.h2h.bcmh2hcodegenerator.common.utils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.bcm.h2h.bcmh2hcodegenerator.common.constant.Constants;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.springframework.util.FileCopyUtils;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
  * @author yuelong.liang
  */
+@Slf4j
 public class MyVelocityUtils {
 
     /**
@@ -124,6 +136,60 @@ public class MyVelocityUtils {
             }
         }
         return importList;
+    }
+
+    /**
+     * 枚举类生成
+     *
+     * @param config vm.json
+     */
+    public static void genEnums(JSONObject config) throws IOException {
+        // 获取要生成的枚举变量
+        JSONArray genEnums = config.getJSONArray("genEnums");
+        // 获取枚举模板配置
+        JSONObject enumVm = config.getJSONObject("enumVm");
+        for (int i = 0; i < genEnums.size(); i++) {
+            // 获取当期数组位置的枚举变量, 设置到 context
+            JSONObject enumConfig = genEnums.getJSONObject(i);
+            VelocityContext enumContext = new VelocityContext(enumConfig);
+            // 设置作者
+            enumContext.put("author", config.get("author"));
+            // 设置 datetime
+            enumContext.put("datetime", DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"));
+            // 设置生成路径
+            enumConfig.put("genPath", config.get("genPath"));
+            // javaPath
+            enumConfig.put("javaPath", config.get("javaPath"));
+            output(enumVm, enumConfig, enumContext);
+        }
+    }
+
+    /**
+     * 将 SpringWriter 的内容输出到指定路径
+     *
+     * @param vm     vm
+     * @param config config
+     * @return content
+     * @throws IOException e
+     */
+    public static StringWriter output(JSONObject vm, JSONObject config, VelocityContext context) throws IOException {
+        StringWriter writer = new StringWriter();
+        // 读取模板
+        Template template = Velocity.getTemplate(vm.getString("path"), Constants.UTF8);
+        // 渲染变量到模板内容
+        template.merge(context, writer);
+        String fileName = MyVelocityUtils.getFileName(vm, config);
+        // 输出到指定目录
+        Path outPath = Paths.get(fileName);
+        // 判断路径是存在, 不存在则创建
+        Path parent = outPath.getParent();
+        if (Files.notExists(parent)) {
+            Files.createDirectories(parent);
+        }
+        log.info("生成 : " + vm.getString("path") + " 到 :" + outPath);
+        FileCopyUtils.copy(writer.toString(), new PrintWriter(outPath.toFile()));
+        log.info("write success");
+        return writer;
     }
 
 }

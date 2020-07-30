@@ -2,31 +2,20 @@ package com.bcm.h2h.bcmh2hcodegenerator.run;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.bcm.h2h.bcmh2hcodegenerator.common.constant.Constants;
 import com.bcm.h2h.bcmh2hcodegenerator.common.utils.DBUtils;
 import com.bcm.h2h.bcmh2hcodegenerator.common.utils.MyVelocityUtils;
 import com.bcm.h2h.bcmh2hcodegenerator.common.utils.VelocityInitializer;
-import com.bcm.h2h.bcmh2hcodegenerator.common.utils.YamlUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
-import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * @author yuelong.liang
@@ -56,28 +45,18 @@ public class CodeGenerator {
         // 将变量放入 content
         log.info("config:" + config);
         VelocityContext context = MyVelocityUtils.prepareContext(config);
+        boolean isGenTable = config.get("genTable") != null && config.getBooleanValue("genTable");
         // 渲染結果 list
         for (JSONObject vm : vmList) {
-            //渲染模板
-            StringWriter writer = new StringWriter();
-            Template tpl = Velocity.getTemplate(vm.getString("path"), Constants.UTF8);
-            tpl.merge(context, writer);
-            String fileName = MyVelocityUtils.getFileName(vm, config);
-            // 输出到指定目录
-            Path outPath = Paths.get(fileName);
-            // 判断路径是存在, 不存在则创建
-            Path parent = outPath.getParent();
-            if (Files.notExists(parent)) {
-                Files.createDirectories(parent);
-            }
-            if (vm.getString("path").contains("table.sql")) {
+            // 渲染并输出模板到文件
+            StringWriter writer = MyVelocityUtils.output(vm, config, context);
+            if (isGenTable && vm.getString("path").contains("table.sql")) {
                 // 执行 sql
                 DBUtils.createTable(writer.toString());
             }
-            log.info("生成 : " + vm.getString("path") + " 到 :" + outPath);
-            FileCopyUtils.copy(writer.toString(), new PrintWriter(outPath.toFile()));
-            log.info("write success");
         }
+        // 生成枚举类
+        MyVelocityUtils.genEnums(config);
         log.info("生成完成");
     }
 
@@ -104,21 +83,6 @@ public class CodeGenerator {
 
     public static JSONObject readVmJson(String vmJsonPath) throws IOException {
         return JSON.parseObject(StreamUtils.copyToString(new ClassPathResource(vmJsonPath).getInputStream(), StandardCharsets.UTF_8));
-    }
-
-    /**
-     * 读取 yaml 文件
-     *
-     * @param path 文件路径
-     * @return Properties
-     */
-    public static JSONObject readYaml(String path) {
-        YamlPropertiesFactoryBean bean = new YamlPropertiesFactoryBean();
-        bean.setResources(new ClassPathResource(path));
-        bean.afterPropertiesSet();
-        Properties prop = bean.getObject();
-        String json = JSON.toJSONString(YamlUtils.toHump(prop));
-        return JSON.parseObject(json);
     }
 
 }

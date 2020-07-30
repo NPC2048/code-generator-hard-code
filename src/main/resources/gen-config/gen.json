@@ -6,14 +6,43 @@
       "value": "CommonStatusEnum"
     }
   ],
-  "enums": [
+  "enumVm": {
+    "path": "vm/java/enum/enum.java.vm",
+    "moduleName": "bcm-h2h-common",
+    "fileName": "enums/{}Enum.java"
+  },
+  "genEnums": [
     {
       "className": "LanguageType",
       "values": [
         {
           "NAME": "JAVA",
-          "code": 0,
-          "name": "JAVA"
+          "name": "java"
+        },
+        {
+          "NAME": "PYTHON",
+          "name": "python"
+        },
+        {
+          "NAME": "GOLANG",
+          "name": "golang"
+        }
+      ]
+    },
+    {
+      "className": "Gender",
+      "values": [
+        {
+          "NAME": "MAN",
+          "name": "男"
+        },
+        {
+          "NAME": "WOMAN",
+          "name": "女"
+        },
+        {
+          "NAME": "UNKNOWN",
+          "name": "未知"
         }
       ]
     }
@@ -36,6 +65,7 @@
       "comment": "语言类型",
       "sqlType": "tinyint",
       "formQueryType": "select",
+      "formatter": true,
       "queryType": "eq"
     },
     {

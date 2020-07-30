@@ -4,10 +4,46 @@ package ${packageName}.common.enums;
  * @author ${author}
  * @date ${datetime}
  */
-public enum ${ClassName}Enum {
+public enum ${className}Enum {
 
-    #foreach($column in $columns)
-      $column.NAME($velocityCount, "")
-    #end
+#foreach($value in $values)
+    #set($code=$velocityCount - 1)
+    ${value.NAME}(${code}, "${value.name}")#if($velocityCount<$values.size()),
+#end
+#end
+    ;
 
+    private Integer code;
+
+    private String name;
+
+    public ${className}Enum(Integer code, String name) {
+        this.code = code;
+        this.name = name;
+    }
+
+    public static ${className}Enum convert(Integer code) {
+        for (${className}Enum target : values()) {
+            if (target.code.equals(code)) {
+                return target;
+            }
+        }
+        return null;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    public java.lang.String getName() {
+        return name;
+    }
+
+    public void setName(java.lang.String name) {
+        this.name = name;
+    }
 }
