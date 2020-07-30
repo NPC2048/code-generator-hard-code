@@ -160,6 +160,8 @@ public class MyVelocityUtils {
             enumConfig.put("genPath", config.get("genPath"));
             // javaPath
             enumConfig.put("javaPath", config.get("javaPath"));
+            // 包名
+            enumConfig.put("packageName", config.get("packageName"));
             output(enumVm, enumConfig, enumContext);
         }
     }
